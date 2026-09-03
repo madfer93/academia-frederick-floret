@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, Phone, GraduationCap, ArrowRight, ShieldCheck } from 'lucide-react';
 
+import Image from 'next/image';
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,42 +38,42 @@ export default function Navbar() {
 
       {/* Barra de navegación principal */}
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        {/* Logotipo Oficial */}
+        {/* Logotipo Oficial del Manual */}
         <Link href="/" className="flex items-center gap-3 group">
-          {/* Isotipo 'F' Oficial en SVG con gradiente corporativo */}
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D51C28] to-[#FF8C01] p-0.5 shadow-md group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#D51C28]/10 to-transparent"></div>
-              <span className="text-[#D51C28] font-black text-2xl tracking-tighter">F</span>
-            </div>
+          <div className="h-14 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <Image 
+              src="/logo.png" 
+              alt="Logo Oficial Academia Frederick Floret" 
+              width={140} 
+              height={60} 
+              className="h-12 w-auto object-contain"
+              priority
+            />
           </div>
-          <div>
+          <div className="border-l border-slate-200 pl-3 hidden sm:block">
             <div className="flex items-center gap-1.5">
-              <span className="text-xl font-black tracking-tight text-slate-900 leading-none">
-                FREDERICK <span className="text-[#D51C28]">FLORET</span>
-              </span>
-              <span className="text-[10px] font-bold bg-red-100 text-[#D51C28] px-1.5 py-0.5 rounded-full">
-                34 AÑOS
+              <span className="text-[10px] font-bold bg-red-100 text-[#D51C28] px-2 py-0.5 rounded-full">
+                34 AÑOS · DESDE 1991
               </span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 tracking-wider uppercase mt-1">
-              Educación para el Trabajo y el Desarrollo Humano
+            <p className="text-[11px] font-semibold text-slate-500 tracking-wider uppercase mt-0.5">
+              Educación para el Trabajo y Desarrollo Humano
             </p>
           </div>
         </Link>
 
         {/* Enlaces Desktop */}
         <div className="hidden lg:flex items-center gap-8">
-          <Link href="#inicio" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
+          <Link href="/" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
             Inicio
           </Link>
-          <Link href="#programas" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
+          <Link href="/programas" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
             Programas Técnicos
           </Link>
-          <Link href="#nosotros" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
+          <Link href="/nosotros" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
             Nuestra Institución
           </Link>
-          <Link href="#sede" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
+          <Link href="/sede" className="text-sm font-semibold text-slate-700 hover:text-[#D51C28] transition-colors">
             Sede Montería
           </Link>
         </div>
@@ -92,7 +94,7 @@ export default function Navbar() {
 
           {/* Botón de Inscripción */}
           <Link
-            href="#inscripciones"
+            href="/inscripciones"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D51C28] to-[#FF8C01] text-white text-xs font-bold shadow-md shadow-red-500/20 hover:shadow-lg hover:brightness-105 transition-all"
           >
             <span>Inscripciones 2026</span>
@@ -103,7 +105,7 @@ export default function Navbar() {
         {/* Botón Móvil */}
         <div className="lg:hidden flex items-center gap-2">
           <Link
-            href="#inscripciones"
+            href="/inscripciones"
             className="px-3.5 py-2 rounded-lg bg-[#D51C28] text-white text-xs font-bold"
           >
             Inscribirme
@@ -122,28 +124,28 @@ export default function Navbar() {
       {isOpen && (
         <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-4 duration-200">
           <Link
-            href="#inicio"
+            href="/"
             onClick={() => setIsOpen(false)}
             className="block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-800 hover:bg-red-50 hover:text-[#D51C28]"
           >
             Inicio
           </Link>
           <Link
-            href="#programas"
+            href="/programas"
             onClick={() => setIsOpen(false)}
             className="block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-800 hover:bg-red-50 hover:text-[#D51C28]"
           >
             Programas Técnicos
           </Link>
           <Link
-            href="#nosotros"
+            href="/nosotros"
             onClick={() => setIsOpen(false)}
             className="block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-800 hover:bg-red-50 hover:text-[#D51C28]"
           >
             Nuestra Institución
           </Link>
           <Link
-            href="#sede"
+            href="/sede"
             onClick={() => setIsOpen(false)}
             className="block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-800 hover:bg-red-50 hover:text-[#D51C28]"
           >
@@ -161,7 +163,7 @@ export default function Navbar() {
               Ingresar al Portal Q10
             </a>
             <Link
-              href="#inscripciones"
+              href="/inscripciones"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#D51C28] to-[#FF8C01] text-white font-bold text-sm"
             >

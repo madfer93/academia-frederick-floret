@@ -45,16 +45,12 @@ export default function Footer() {
           {/* Columna 1: Marca e Identidad */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#D51C28] to-[#FF8C01] flex items-center justify-center text-white font-black text-xl shadow-md">
-                F
-              </div>
-              <div>
-                <span className="text-white font-black text-lg tracking-tight block leading-tight">
-                  FREDERICK <span className="text-[#D51C28]">FLORET</span>
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">
-                  Desde 1991 · 34 Años
-                </span>
+              <div className="h-16 flex items-center justify-center p-1 bg-white/10 rounded-xl">
+                <img
+                  src="/logo.png"
+                  alt="Logo Oficial Academia Frederick Floret"
+                  className="h-14 w-auto object-contain brightness-105"
+                />
               </div>
             </div>
 
@@ -76,27 +72,27 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-slate-400">
               <li>
-                <Link href="#programas" className="hover:text-white transition-colors">
+                <Link href="/programas" className="hover:text-white transition-colors">
                   Auxiliar en Enfermería
                 </Link>
               </li>
               <li>
-                <Link href="#programas" className="hover:text-white transition-colors">
+                <Link href="/programas" className="hover:text-white transition-colors">
                   Auxiliar en Salud Oral
                 </Link>
               </li>
               <li>
-                <Link href="#programas" className="hover:text-white transition-colors">
+                <Link href="/programas" className="hover:text-white transition-colors">
                   Servicios Farmacéuticos
                 </Link>
               </li>
               <li>
-                <Link href="#programas" className="hover:text-white transition-colors">
+                <Link href="/programas" className="hover:text-white transition-colors">
                   Administrativo en Salud
                 </Link>
               </li>
               <li>
-                <Link href="#programas" className="hover:text-white transition-colors">
+                <Link href="/programas" className="hover:text-white transition-colors">
                   Auxiliar en Salud Pública
                 </Link>
               </li>
@@ -121,22 +117,22 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="#inicio" className="hover:text-white transition-colors">
+                <Link href="/" className="hover:text-white transition-colors">
                   Inicio Institucional
                 </Link>
               </li>
               <li>
-                <Link href="#nosotros" className="hover:text-white transition-colors">
+                <Link href="/nosotros" className="hover:text-white transition-colors">
                   Misión y Filosofía
                 </Link>
               </li>
               <li>
-                <Link href="#sede" className="hover:text-white transition-colors">
+                <Link href="/sede" className="hover:text-white transition-colors">
                   Sede Edificio Frederick Floret
                 </Link>
               </li>
               <li>
-                <Link href="#inscripciones" className="hover:text-white transition-colors">
+                <Link href="/inscripciones" className="hover:text-white transition-colors">
                   Admisiones &amp; Cuotas 2026
                 </Link>
               </li>
