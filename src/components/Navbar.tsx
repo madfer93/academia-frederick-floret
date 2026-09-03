@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, Phone, GraduationCap, ArrowRight, ShieldCheck } from 'lucide-react';
 
-import Image from 'next/image';
-
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -38,16 +36,13 @@ export default function Navbar() {
 
       {/* Barra de navegación principal */}
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        {/* Logotipo Oficial del Manual */}
+        {/* Logotipo Oficial */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="h-14 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Image 
+            <img 
               src="/logo.png" 
-              alt="Logo Oficial Academia Frederick Floret" 
-              width={140} 
-              height={60} 
+              alt="Logo Academia Frederick Floret" 
               className="h-12 w-auto object-contain"
-              priority
             />
           </div>
           <div className="border-l border-slate-200 pl-3 hidden sm:block">

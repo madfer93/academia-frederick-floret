@@ -10,8 +10,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Academia Frederick Floret | Educación para el Trabajo y el Desarrollo Humano · Montería',
-  description: '34 años formando los mejores técnicos laborales en Montería y Córdoba: Enfermería, Salud Oral, Farmacia, Administrativo en Salud, Salud Pública y Administración. Licencia No. 001514 y Resolución SEM 0990.',
+  metadataBase: new URL('https://academia-frederick-floret.vercel.app'),
+  title: 'Academia Frederick Floret | Educación Técnica Montería',
+  description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas, crédito directo y 34 años de trayectoria oficial.',
+  alternates: {
+    canonical: 'https://academia-frederick-floret.vercel.app',
+  },
+  verification: {
+    google: 'R8F6UkNMybScXYaszR0NuWk1lbzGOo_vmIkOVuKzEa4',
+  },
   keywords: [
     'Academia Frederick Floret',
     'Cursos tecnicos Monteria',
@@ -22,10 +29,12 @@ export const metadata: Metadata = {
     'Educacion tecnica Cordoba'
   ],
   openGraph: {
-    title: 'Academia Frederick Floret · 34 Años de Excelencia Educativa',
-    description: 'Fórmate en salud y administración en el centro de Montería con 34 años de experiencia y alta inserción laboral.',
+    title: 'Academia Frederick Floret | Educación Técnica Montería',
+    description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas y 34 años de experiencia.',
     type: 'website',
-    locale: 'es_CO'
+    locale: 'es_CO',
+    url: 'https://academia-frederick-floret.vercel.app',
+    siteName: 'Academia Frederick Floret'
   }
 };
 
