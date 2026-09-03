@@ -150,24 +150,12 @@ export default function ProgramsSection() {
   });
 
   return (
-    <section id="programas" className="py-20 bg-slate-50 border-b border-slate-200">
+    <section id="programas" className="py-12 bg-slate-50 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Cabecera de Sección */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-[#D51C28] text-xs font-bold uppercase tracking-wider">
-            Oferta Académica Vigente
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
-            Nuestros Programas Técnicos Laborales
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Formación práctica diseñada en estrecha articulación con las necesidades reales de contratación en clínicas, empresas e instituciones de Montería y Córdoba.
-          </p>
-
-          {/* Filtros de Categoría */}
-          <div className="pt-4 flex flex-wrap justify-center gap-2">
-            <button
+        {/* Filtros de Categoría Directos */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          <button
               onClick={() => setFilter('todos')}
               className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs ${
                 filter === 'todos'
@@ -198,7 +186,6 @@ export default function ProgramsSection() {
               Área Administrativa (1)
             </button>
           </div>
-        </div>
 
         {/* Grilla de Programas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
