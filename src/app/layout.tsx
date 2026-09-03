@@ -30,6 +30,17 @@ export const metadata: Metadata = {
     'ETDH Monteria',
     'Educacion tecnica Cordoba'
   ],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
   openGraph: {
     title: 'Academia Frederick Floret | Educación Técnica Montería',
     description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas y 34 años de experiencia.',

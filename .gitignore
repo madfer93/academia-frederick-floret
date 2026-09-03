@@ -43,3 +43,10 @@ database/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Auditoria interna local (NO subir a GitHub)
+auditoria_interna.md
+/docs/auditoria/
+CLAUDE.md
+/PROGRAMAS/
+

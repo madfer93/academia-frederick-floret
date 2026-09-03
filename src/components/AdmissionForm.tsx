@@ -10,6 +10,10 @@ const PROGRAMAS_OPTIONS = [
   'Técnico Laboral en Auxiliar en Servicios Farmacéuticos',
   'Técnico Laboral en Auxiliar Administrativo en Salud',
   'Técnico Laboral en Auxiliar en Salud Pública',
+  'Técnico Laboral en Auxiliar de Educación para la Primera Infancia',
+  'Técnico Laboral en Auxiliar Contable y Financiero',
+  'Técnico Laboral en Asistentes de Marketing y Comunicación',
+  'Técnico Laboral en Auxiliar en Deporte y Recreación',
   'Técnico Laboral en Auxiliar Administrativo Organizacional'
 ];
 
