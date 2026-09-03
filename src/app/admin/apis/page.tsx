@@ -13,7 +13,11 @@ import {
   Mail, 
   Globe, 
   Share2, 
-  Send
+  Send,
+  Bot,
+  Sparkles,
+  Image as ImageIcon,
+  MessageSquare
 } from 'lucide-react';
 
 export default function AdminApisPage() {
@@ -60,6 +64,12 @@ export default function AdminApisPage() {
     q10_api_key: '',
     telegram_bot_token: '',
     telegram_chat_id: '',
+
+    // 6. Personalización Chatbot IA 24/7 (FloretBot)
+    chatbot_nombre: 'FloretBot',
+    chatbot_subtitulo: 'Academia Frederick Floret · En línea',
+    chatbot_avatar_url: '',
+    chatbot_bienvenida: '¡Hola! 👋 Soy **FloretBot**, el asesor virtual con Inteligencia Artificial de la **Academia Frederick Floret**. ¿En qué programa técnico te gustaría capacitarte o qué duda tienes sobre requisitos, horarios o pagos en cuotas?',
   });
 
   // Cargar llaves desde Supabase (sitio_configuracion)
@@ -325,6 +335,199 @@ export default function AdminApisPage() {
                   placeholder="Ej. -100..."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
                 />
+              </div>
+            </div>
+
+            {/* SUB-SECCIÓN: PERSONALIZACIÓN VISUAL DEL CHATBOT */}
+            <div className="border-t border-slate-200 pt-6 mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+                <div>
+                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-[#D51C28]" />
+                    <span>Personalización &amp; Marca del Asistente Virtual (FloretBot)</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Modifica el nombre, avatar, subtítulo y mensaje de bienvenida que ven los estudiantes en la web.
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-md bg-red-50 text-[#D51C28] text-[10px] font-black uppercase border border-red-200 self-start">
+                  Burbuja Web 24/7
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Formulario de Campos */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Nombre del Asistente *
+                      </label>
+                      <input
+                        type="text"
+                        name="chatbot_nombre"
+                        value={formData.chatbot_nombre}
+                        onChange={handleChange}
+                        placeholder="Ej: FloretBot"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Subtítulo / Estado
+                      </label>
+                      <input
+                        type="text"
+                        name="chatbot_subtitulo"
+                        value={formData.chatbot_subtitulo}
+                        onChange={handleChange}
+                        placeholder="Ej: Academia Frederick Floret · En línea"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      URL de la Imagen / Avatar del Bot
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        name="chatbot_avatar_url"
+                        value={formData.chatbot_avatar_url}
+                        onChange={handleChange}
+                        placeholder="https://... o deja vacío para usar el ícono del bot"
+                        className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50 font-mono"
+                      />
+                      {formData.chatbot_avatar_url && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, chatbot_avatar_url: '' }))}
+                          className="px-3 py-2 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                          title="Restablecer al ícono predeterminado"
+                        >
+                          Limpiar
+                        </button>
+                      )}
+                    </div>
+                    {/* Atajos de avatares */}
+                    <div className="flex items-center gap-2 pt-1 flex-wrap">
+                      <span className="text-[10px] text-slate-400 font-semibold">Avatares rápidos:</span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, chatbot_avatar_url: '/logo.png' }))}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                      >
+                        Logo Institucional
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, chatbot_avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' }))}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                      >
+                        Asesora Académica
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, chatbot_avatar_url: '' }))}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                      >
+                        Robot Naranja (Default)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Mensaje de Bienvenida Inicial *
+                    </label>
+                    <textarea
+                      rows={4}
+                      name="chatbot_bienvenida"
+                      value={formData.chatbot_bienvenida}
+                      onChange={handleChange}
+                      placeholder="Escribe el saludo que verá el usuario..."
+                      className="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50 leading-relaxed font-sans"
+                    />
+                    <p className="text-[10px] text-slate-400">
+                      Tip: Puedes usar asteriscos para **negrita** o emojis para dar calidez al saludo.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Previsualizador en Vivo (Live Mockup) */}
+                <div className="lg:col-span-5 bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between border border-slate-800 shadow-inner">
+                  <div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                      <span>Vista Previa en Tiempo Real</span>
+                      <span className="text-emerald-400 font-extrabold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> En Vivo
+                      </span>
+                    </div>
+
+                    {/* Simulación Ventana Chat */}
+                    <div className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-xl border border-slate-700 text-xs">
+                      {/* Header Simulado */}
+                      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-[#041933] text-white p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="relative">
+                            {formData.chatbot_avatar_url ? (
+                              <img
+                                src={formData.chatbot_avatar_url}
+                                alt="Avatar preview"
+                                className="w-9 h-9 rounded-xl object-cover border border-slate-700 bg-slate-800"
+                              />
+                            ) : (
+                              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#D51C28] to-[#FF8C01] flex items-center justify-center font-black text-white shadow-xs">
+                                <Bot className="w-4 h-4" />
+                              </div>
+                            )}
+                            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-bold text-xs">{formData.chatbot_nombre || 'FloretBot'}</span>
+                              <span className="px-1 py-0.5 rounded-md bg-red-500/20 text-red-400 text-[8px] font-extrabold uppercase border border-red-500/30 flex items-center gap-0.5">
+                                <Sparkles className="w-2 h-2" /> IA 24/7
+                              </span>
+                            </div>
+                            <p className="text-[9px] text-slate-300 truncate max-w-[150px]">
+                              {formData.chatbot_subtitulo || 'Academia Frederick Floret · En línea'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Cuerpo Simulado con el mensaje */}
+                      <div className="p-3 bg-slate-50 space-y-2">
+                        <div className="flex gap-2 items-start">
+                          {formData.chatbot_avatar_url ? (
+                            <img
+                              src={formData.chatbot_avatar_url}
+                              alt="Avatar"
+                              className="w-6 h-6 rounded-lg object-cover shrink-0 mt-0.5 border border-slate-200 bg-white"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-[#D51C28] to-[#FF8C01] text-white flex items-center justify-center shrink-0 mt-0.5">
+                              <Bot className="w-3 h-3" />
+                            </div>
+                          )}
+                          <div className="bg-white border border-slate-200 p-2.5 rounded-xl rounded-tl-xs text-[11px] text-slate-800 leading-relaxed shadow-xs">
+                            {formData.chatbot_bienvenida || 'Escribe un mensaje de bienvenida...'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 text-center mt-3">
+                    Así se mostrará a los visitantes en la esquina de la página.
+                  </p>
+                </div>
+
               </div>
             </div>
           </div>

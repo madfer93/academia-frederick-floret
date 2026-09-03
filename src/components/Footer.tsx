@@ -136,6 +136,12 @@ export default function Footer() {
                   Admisiones &amp; Cuotas 2026
                 </Link>
               </li>
+              <li>
+                <Link href="/politicas" className="hover:text-white transition-colors text-slate-300 font-medium flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Políticas &amp; Privacidad</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -172,8 +178,33 @@ export default function Footer() {
 
         </div>
 
+        {/* Barra de Transparencia Normativa y Políticas Legales */}
+        <div className="mt-12 pt-6 border-t border-slate-900 flex flex-wrap items-center justify-between gap-y-3 gap-x-6 text-[11px] text-slate-400">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="font-semibold text-slate-300">Marco Legal &amp; Transparencia:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-400">
+            <Link href="/politicas/tratamiento-datos" className="hover:text-white transition-colors">
+              Tratamiento de Datos (Ley 1581)
+            </Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/politicas/habeas-data" className="hover:text-white transition-colors">
+              Habeas Data &amp; Derechos ARCO
+            </Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/politicas/uso-ia-iso-42001" className="hover:text-white transition-colors">
+              Uso Ético de IA (ISO 42001)
+            </Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/politicas/consentimiento-imagenes" className="hover:text-white transition-colors">
+              Consentimiento de Imagen y Voz
+            </Link>
+          </div>
+        </div>
+
         {/* Separador */}
-        <hr className="border-slate-800 my-10" />
+        <hr className="border-slate-800 my-8" />
 
         {/* Pie de Página con Firma de Desarrollo J&M Tech Solutions */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left text-slate-500 text-[11px]">

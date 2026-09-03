@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import ChatBubble from '@/components/ChatBubble';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import './globals.css';
 
 const inter = Inter({
@@ -50,6 +52,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col">
         {children}
+        <WhatsAppButton />
+        <ChatBubble />
         <Analytics />
       </body>
     </html>
