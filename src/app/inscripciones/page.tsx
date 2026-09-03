@@ -6,13 +6,70 @@ import Footer from '@/components/Footer';
 import { CreditCard, FileCheck2, UserCheck, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Inscripciones y Admisiones 2026 | Academia Frederick Floret Montería',
-  description: 'Diligencia tu formulario de inscripción online para programas técnicos en salud y administración en Montería. Pagos en cuotas directas sin bancos.',
+  title: 'Inscripciones y Admisiones 2026 | Academia Frederick Floret',
+  description: 'Inscríbete online a carreras técnicas laborales en Montería. Facilidades de pago en 4 cuotas sin bancos ni intereses y crédito educativo directo.',
+  alternates: {
+    canonical: 'https://academia-frederick-floret.vercel.app/inscripciones',
+  },
+  openGraph: {
+    title: 'Inscripciones y Admisiones 2026 | Academia Frederick Floret',
+    description: 'Inscríbete online a carreras técnicas laborales en Montería. Facilidades de pago en 4 cuotas sin bancos ni intereses y crédito educativo directo.',
+    url: 'https://academia-frederick-floret.vercel.app/inscripciones',
+    type: 'website',
+    locale: 'es_CO',
+  },
+};
+
+const INSCRIPCIONES_SCHEMA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ContactPage",
+      "name": "Admisiones e Inscripciones Academia Frederick Floret",
+      "url": "https://academia-frederick-floret.vercel.app/inscripciones",
+      "description": "Formulario de reserva de cupo y preinscripción para programas técnicos laborales en Montería."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cuáles son los requisitos para inscribirme en un programa técnico?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Haber aprobado mínimo 9º grado o ser bachiller graduado, presentar documento de identidad vigente (TI, CC o PPT) y tener 16 años cumplidos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo funciona la financiación y el pago en cuotas?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Puedes diferir el costo del semestre en 4 cuotas mensuales directas con la Academia, sin intermediación de bancos ni cobro de intereses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuáles son los horarios de clase disponibles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Contamos con cuatro jornadas flexibles: Diurna Mañana (8:00 - 11:00 am), Diurna Tarde (2:00 - 5:00 pm), Nocturna (6:30 - 9:00 pm) y Sabatina (7:00 am - 5:00 pm)."
+          }
+        }
+      ]
+    }
+  ]
 };
 
 export default function InscripcionesPage() {
   return (
     <main className="min-h-screen flex flex-col bg-slate-50">
+      {/* Schema JSON-LD de Admisiones y FAQ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(INSCRIPCIONES_SCHEMA) }}
+      />
+
       <Navbar />
 
       {/* Header Banner */}

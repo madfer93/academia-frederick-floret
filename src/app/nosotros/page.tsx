@@ -7,13 +7,51 @@ import Link from 'next/link';
 import { Award, ShieldCheck, Scale, CheckCircle2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Nuestra Institución | 34 Años de Trayectoria · Academia Frederick Floret',
-  description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, Córdoba.',
+  title: 'Nuestra Institución | 34 Años de Trayectoria en Montería',
+  description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
+  alternates: {
+    canonical: 'https://academia-frederick-floret.vercel.app/nosotros',
+  },
+  openGraph: {
+    title: 'Nuestra Institución | 34 Años de Trayectoria en Montería',
+    description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
+    url: 'https://academia-frederick-floret.vercel.app/nosotros',
+    type: 'website',
+    locale: 'es_CO',
+  },
+};
+
+const NOSOTROS_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "Acerca de la Academia Frederick Floret",
+  "url": "https://academia-frederick-floret.vercel.app/nosotros",
+  "mainEntity": {
+    "@type": "EducationalOrganization",
+    "name": "Academia Frederick Floret S.A.S.",
+    "foundingDate": "1991-11-18",
+    "description": "Institución de Educación para el Trabajo y el Desarrollo Humano en Montería con licencias No. 001514 y Resolución SEM 0990 de 2022.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Calle 27 No. 10 - 21 Barrio Centro",
+      "addressLocality": "Montería",
+      "addressRegion": "Córdoba",
+      "addressCountry": "CO"
+    },
+    "slogan": "Formando el hombre del futuro, educamos con amor, calidad y eficiencia",
+    "knowsAbout": ["Auxiliar en Enfermería", "Auxiliar en Salud Oral", "Servicios Farmacéuticos", "Administrativo en Salud", "Auxiliar Administrativo"]
+  }
 };
 
 export default function NosotrosPage() {
   return (
     <main className="min-h-screen flex flex-col bg-slate-50">
+      {/* Schema JSON-LD AboutPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(NOSOTROS_SCHEMA) }}
+      />
+
       <Navbar />
 
       {/* Header Banner */}

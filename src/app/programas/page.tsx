@@ -7,16 +7,120 @@ import Link from 'next/link';
 import { ArrowRight, GraduationCap } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Programas Técnicos Laborales | Academia Frederick Floret Montería',
-  description: 'Conoce nuestra oferta académica en Salud y Administración: Enfermería, Salud Oral, Farmacia, Administrativo en Salud, Salud Pública y Auxiliar Organizacional.',
+  title: 'Programas Técnicos Laborales en Montería | Frederick Floret',
+  description: 'Estudia Enfermería, Salud Oral, Farmacia, Administrativo en Salud y Gestión en Montería. Formación práctica de 3 semestres y créditos directos.',
+  alternates: {
+    canonical: 'https://academia-frederick-floret.vercel.app/programas',
+  },
+  openGraph: {
+    title: 'Programas Técnicos Laborales en Montería | Frederick Floret',
+    description: 'Estudia Enfermería, Salud Oral, Farmacia, Administrativo en Salud y Gestión en Montería. Formación práctica de 3 semestres y créditos directos.',
+    url: 'https://academia-frederick-floret.vercel.app/programas',
+    type: 'website',
+    locale: 'es_CO',
+  },
+};
+
+const PROGRAMS_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Programas Técnicos Laborales de Academia Frederick Floret",
+  "itemListElement": [
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 1,
+      "name": "Técnico Laboral en Auxiliar en Enfermería",
+      "description": "Formación clínica y asistencial para cuidado de pacientes, administración de medicamentos y apoyo en urgencias y cirugía.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "occupationalCategory": "3221 - Auxiliares de Enfermería",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 2,
+      "name": "Técnico Laboral en Auxiliar en Salud Oral",
+      "description": "Asistencia clínica odontológica, preparación de biomateriales dentales y esterilización de instrumental.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 3,
+      "name": "Técnico Laboral en Auxiliar en Servicios Farmacéuticos",
+      "description": "Dispensación de medicamentos, control de inventarios técnicos y normatividad sanitaria Invima.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 4,
+      "name": "Técnico Laboral en Auxiliar Administrativo en Salud",
+      "description": "Admisión de pacientes, facturación médica ante EPS/IPS, trámite de glosas y auditoría en salud.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 5,
+      "name": "Técnico Laboral en Auxiliar en Salud Pública",
+      "description": "Vigilancia epidemiológica comunitaria, brigadas de vacunación y programas gubernamentales de prevención.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "position": 6,
+      "name": "Técnico Laboral en Auxiliar Administrativo Organizacional",
+      "description": "Gestión empresarial, servicio al cliente, apoyo contable, nómina y talento humano con 660 horas certificadas.",
+      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
+      "timeToComplete": "P18M",
+      "occupationalCategory": "1341 - Asistentes y Auxiliares Administrativos",
+      "provider": {
+        "@type": "EducationalOrganization",
+        "name": "Academia Frederick Floret",
+        "url": "https://academia-frederick-floret.vercel.app"
+      }
+    }
+  ]
 };
 
 export default function ProgramasPage() {
   return (
     <main className="min-h-screen flex flex-col bg-slate-50">
+      {/* Schema JSON-LD de Programas Educativos */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(PROGRAMS_SCHEMA) }}
+      />
+
       <Navbar />
 
-      {/* Header Banner de la página */}
+      {/* Header Banner */}
       <section className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white py-14 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-3 text-center md:text-left">

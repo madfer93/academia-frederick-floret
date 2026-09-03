@@ -5,13 +5,66 @@ import Footer from '@/components/Footer';
 import { MapPin, Phone, Mail, Clock, Building, Monitor, ShieldCheck, MessageCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Sede e Instalaciones | Edificio Frederick Floret · Montería',
-  description: 'Visita nuestra sede central en la Calle 27 #10-21 en Montería. 353 m² con 3 pisos, sala de 80 computadores, aulas y laboratorios prácticos.',
+  title: 'Sede e Instalaciones en Montería | Edificio Frederick Floret',
+  description: 'Visita nuestra sede en Calle 27 #10-21 en Montería. 353 m² en 3 plantas, sala de 80 computadores, aulas teóricas y laboratorios prácticos.',
+  alternates: {
+    canonical: 'https://academia-frederick-floret.vercel.app/sede',
+  },
+  openGraph: {
+    title: 'Sede e Instalaciones en Montería | Edificio Frederick Floret',
+    description: 'Visita nuestra sede en Calle 27 #10-21 en Montería. 353 m² en 3 plantas, sala de 80 computadores, aulas teóricas y laboratorios prácticos.',
+    url: 'https://academia-frederick-floret.vercel.app/sede',
+    type: 'website',
+    locale: 'es_CO',
+  },
+};
+
+const SEDE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Academia Frederick Floret - Sede Central Montería",
+  "url": "https://academia-frederick-floret.vercel.app/sede",
+  "image": "https://academia-frederick-floret.vercel.app/logo.png",
+  "telephone": "+573205206613",
+  "email": "academiafrederickfloret@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Calle 27 No. 10 - 21, Barrio Centro",
+    "addressLocality": "Montería",
+    "addressRegion": "Córdoba",
+    "postalCode": "230001",
+    "addressCountry": "CO"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 8.7558,
+    "longitude": -75.8814
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "08:00",
+      "closes": "18:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday"],
+      "opens": "08:00",
+      "closes": "13:00"
+    }
+  ]
 };
 
 export default function SedePage() {
   return (
     <main className="min-h-screen flex flex-col bg-slate-50">
+      {/* Schema JSON-LD de LocalBusiness / Sede */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SEDE_SCHEMA) }}
+      />
+
       <Navbar />
 
       {/* Header Banner */}
@@ -87,7 +140,7 @@ export default function SedePage() {
 
               </div>
 
-              {/* Dirección y Mapa informativo */}
+              {/* Dirección y Ubicación */}
               <div className="p-6 rounded-2xl bg-slate-900 text-white space-y-3">
                 <h4 className="text-sm font-bold text-amber-400">¿Cómo llegar a nuestra sede?</h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
