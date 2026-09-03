@@ -45,6 +45,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} scroll-smooth`}>
+      <head>
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLMs Context" />
+      </head>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col">
         {children}
         <Analytics />

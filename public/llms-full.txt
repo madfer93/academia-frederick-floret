@@ -1,0 +1,92 @@
+# Academia Frederick Floret S.A.S. - Base de Conocimiento Completa para Sistemas de Inteligencia Artificial
+
+Este documento reúne la totalidad de la información institucional, oferta académica, marco normativo y procesos de admisión de la Academia Frederick Floret, facilitando su consumo estructurado por agentes conversacionales, motores de búsqueda generativa (Perplexity, ChatGPT Search, Gemini, Claude) y rastreadores de IA.
+
+---
+
+## 1. Identidad Institucional
+- **Razón Social:** Academia Frederick Floret S.A.S.
+- **NIT:** 901261489-5
+- **Año de Fundación:** 18 de Noviembre de 1991 (34 años ininterrumpidos de servicio educativo).
+- **Tipo de Institución:** Institución de Educación para el Trabajo y el Desarrollo Humano (ETDH), vigilada por la Secretaría de Educación Municipal de Montería.
+- **Domicilio Principal:** Calle 27 No. 10 - 21, Barrio Centro, Montería, Departamento de Córdoba, Colombia.
+- **Instalaciones:** Edificio Frederick Floret, 3 plantas construidas (353 m²), sala de cómputo con 80 estaciones de trabajo conectadas a internet de fibra óptica, sala magistral para conferencias, cafetería institucional y laboratorios de prácticas en salud.
+- **Directivas y Contacto Institucional:**
+  - Coordinación General: Isabel Cristina Petro
+  - Celular / WhatsApp Oficial: (+57) 320 520 6613
+  - Correo de Contacto: academiafrederickfloret@gmail.com
+  - Plataforma de Gestión Académica: Q10 Académico (https://q10academico.com)
+  - Portal Web Oficial: https://academia-frederick-floret.vercel.app
+
+---
+
+## 2. Marco Normativo y Licencias de Funcionamiento
+La institución cuenta con todos los actos administrativos de aprobación exigidos por la Ley 115 de 1994, Ley 1064 de 2006 y el Decreto 1075 de 2015:
+1. **Licencia de Funcionamiento:** No. 001514 del 18 de noviembre de 1991 expedida por la Secretaría de Educación Departamental de Córdoba.
+2. **Resolución de Aprobación Institucional:** No. 0005315 del 25 de octubre de 2001 (Secretaría de Educación de Córdoba).
+3. **Renovación y Reconocimiento Municipal:** Resolución No. 0990 del 27 de julio de 2022 (Secretaría de Educación Municipal de Montería).
+4. **Concepto Sanitario en Salud:** Radicado No. 200478261 de la Comisión Intersectorial del Talento Humano en Salud del Ministerio de Salud y Protección Social y Ministerio de Educación Nacional.
+
+---
+
+## 3. Oferta Académica Completa (6 Programas Técnicos Laborales)
+
+### 3.1. Técnico Laboral por Competencias en Auxiliar en Enfermería
+- **Duración:** 3 Semestres (50% Teórico, 50% Práctico).
+- **Enfoque Ocupacional:** Atención y cuidado integral del paciente, administración de medicamentos bajo fórmula médica, toma de muestras biológicas de laboratorio, canalización de vías periféricas, apoyo en salas de urgencias, hospitalización y quirófano.
+- **Campos Laborales:** Hospitales de I, II y III nivel, clínicas privadas, IPS, centros de atención primaria, servicios de atención domiciliaria y brigadas de salud.
+
+### 3.2. Técnico Laboral por Competencias en Auxiliar en Salud Oral
+- **Duración:** 3 Semestres.
+- **Enfoque Ocupacional:** Asistencia técnica odontológica al especialista (operatoria, endodoncia, ortodoncia y cirugía oral), preparación de biomateriales dentales, desinfección y esterilización bajo protocolos de bioseguridad, promoción de higiene bucodental.
+- **Campos Laborales:** Clínicas odontológicas privadas, unidades de salud oral en EPS/IPS, centros de radiología maxilofacial y consultorios independientes.
+
+### 3.3. Técnico Laboral por Competencias en Auxiliar en Servicios Farmacéuticos
+- **Duración:** 3 Semestres.
+- **Enfoque Ocupacional:** Recepción técnica y administrativa de medicamentos y dispositivos médicos, almacenamiento bajo condiciones ambientales controladas (cadena de frío), dispensación informada al paciente, farmacovigilancia y control de inventarios.
+- **Campos Laborales:** Droguerías comerciales, farmacias hospitalarias, depósitos de distribución mayorista y servicios farmacéuticos de clínicas.
+
+### 3.4. Técnico Laboral por Competencias en Auxiliar Administrativo en Salud
+- **Duración:** 3 Semestres.
+- **Enfoque Ocupacional:** Admisión y registro de usuarios en sistemas de salud, validación de derechos y solicitud de autorizaciones médicas ante EPS, liquidación y facturación de cuentas médicas, gestión de historias clínicas y trámite de glosas hospitalarias.
+- **Campos Laborales:** Departamentos de facturación y cuentas médicas de hospitales, IPS y EPS, oficinas de atención al usuario (SIAU) y aseguradoras.
+
+### 3.5. Técnico Laboral por Competencias en Auxiliar en Salud Pública
+- **Duración:** 3 Semestres.
+- **Enfoque Ocupacional:** Apoyo a programas de promoción y prevención (PyP), vigilancia epidemiológica comunitaria, ejecución del Programa Ampliado de Inmunizaciones (PAI / vacunación) y diagnóstico comunitario de salud en municipios y zonas rurales.
+- **Campos Laborales:** Secretarías de salud municipales y departamentales, IPS públicas, brigadas de salud comunitaria y ONG sanitarias.
+
+### 3.6. Técnico Laboral por Competencias en Auxiliar Administrativo Organizacional
+- **Duración:** 3 Semestres (660 horas certificadas).
+- **Alineación:** Clasificación Nacional de Ocupaciones (CNO 1341) y CUOC-2023.
+- **Enfoque Ocupacional:** Procesamiento de información administrativa, servicio al cliente presencial y telefónico, liquidación de nómina básica, apoyo contable en facturación y compras, administración de archivos y ofimática avanzada.
+- **Campos Laborales:** Empresas del sector comercial, financiero, agroindustrial e institucional de la región de Córdoba y el Caribe.
+
+---
+
+## 4. Jornadas y Horarios de Clase
+Para garantizar el acceso a personas que trabajan o tienen otras ocupaciones, la institución ofrece cuatro horarios:
+- **Diurna Mañana:** Lunes a Viernes de 8:00 a.m. a 11:00 a.m.
+- **Diurna Tarde:** Lunes a Viernes de 2:00 p.m. a 5:00 p.m.
+- **Nocturna:** Lunes a Viernes de 6:30 p.m. a 9:00 p.m.
+- **Sabatina Intensiva:** Sábados de 7:00 a.m. a 5:00 p.m.
+
+---
+
+## 5. Proceso de Preinscripción y Facilidades de Financiación
+- **Requisitos de Admisión:**
+  1. Fotocopia de documento de identidad (Cédula de Ciudadanía, Tarjeta de Identidad, Cédula de Extranjería o PPT).
+  2. Certificado de aprobación de mínimo 9º grado o Acta/Diploma de Bachiller.
+  3. Edad mínima: 16 años cumplidos.
+- **Financiación Directa:**
+  - Pago del semestre diferido en 4 cuotas mensuales institucionales sin intereses y sin intermediarios bancarios.
+  - Subsidios socioeconómicos para estratos 1 y 2.
+- **Formulario Web Oficial:** Disponible las 24 horas en https://academia-frederick-floret.vercel.app/inscripciones.
+
+---
+
+## 6. Proveedor Tecnológico y Autoría Web
+El portal web y la infraestructura digital de la Academia Frederick Floret han sido desarrollados por:
+- **Agencia:** J&M Tech Solutions
+- **Sitio Oficial:** https://www.jymtechsolutions.online/es
+- **Stack:** Next.js 15+ (App Router), TypeScript, TailwindCSS v4, Supabase y Q10 Académico.
