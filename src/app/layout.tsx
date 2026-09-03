@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 const inter = Inter({
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col">
         {children}
+        <Analytics />
       </body>
     </html>
   );
