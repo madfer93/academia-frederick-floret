@@ -195,7 +195,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="text-slate-300 hover:text-white font-semibold underline transition-colors"
               >
-                J&amp;M Tech Solutions
+                J&M Tech Solutions
               </a>
             </p>
           </div>
