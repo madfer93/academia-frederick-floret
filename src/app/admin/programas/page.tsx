@@ -74,35 +74,23 @@ export default function AdminProgramasPage() {
     setUploadingId(id);
     setErrorMsg('');
     try {
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
-      // Nombre limpio y único
-      const cleanSlug = slug || 'programa';
-      const filePath = `${cleanSlug}-${Date.now()}.${fileExt}`;
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('bucket', 'programas');
+      uploadFormData.append('slug', slug || 'programa');
+      uploadFormData.append('programId', id);
 
-      // 1. Subir al Bucket 'programas'
-      const { error: uploadError } = await supabase.storage
-        .from('programas')
-        .upload(filePath, file, { 
-          upsert: true,
-          contentType: file.type 
-        });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
 
-      if (uploadError) throw uploadError;
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Error al subir la imagen.');
+      }
 
-      // 2. Obtener URL Pública del archivo
-      const { data: publicUrlData } = supabase.storage
-        .from('programas')
-        .getPublicUrl(filePath);
-
-      const newImageUrl = publicUrlData.publicUrl;
-
-      // 3. Guardar automáticamente en la tabla 'programas'
-      const { error: dbError } = await supabase
-        .from('programas')
-        .update({ imagen_url: newImageUrl })
-        .eq('id', id);
-
-      if (dbError) throw dbError;
+      const newImageUrl = data.url;
 
       // Actualizar estado local
       handleChange(id, 'imagen_url', newImageUrl);
