@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 import { 
   HeartPulse, 
   Smile, 
@@ -23,6 +24,7 @@ import {
 
 interface Program {
   id: string;
+  slug: string;
   titulo: string;
   categoria: 'salud' | 'comercial';
   descripcion: string;
@@ -39,6 +41,7 @@ interface Program {
 const PROGRAMAS: Program[] = [
   {
     id: 'enfermeria',
+    slug: 'auxiliar-en-enfermeria',
     titulo: 'Técnico Laboral en Auxiliar en Enfermería',
     categoria: 'salud',
     descripcion: 'Desarrolla competencias clínicas y asistenciales para el cuidado directo de pacientes, administración de medicamentos bajo normativas, toma de muestras y apoyo integral en salas de cirugía y urgencias.',
@@ -58,6 +61,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'salud-oral',
+    slug: 'auxiliar-en-salud-oral',
     titulo: 'Técnico Laboral en Auxiliar en Salud Oral',
     categoria: 'salud',
     descripcion: 'Asiste al odontólogo en procedimientos clínicos, realiza limpiezas, fluoraciones, aplicación de sellantes, técnicas de asepsia y desinfección, y gestión del consultorio odontológico con alta calidad humana.',
@@ -77,6 +81,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'farmacia',
+    slug: 'servicios-farmaceuticos',
     titulo: 'Técnico Laboral en Auxiliar en Servicios Farmacéuticos',
     categoria: 'salud',
     descripcion: 'Domina los protocolos de dispensación de medicamentos y dispositivos médicos, almacenamiento bajo condiciones técnicas del Invima, recepción técnica y control sistematizado de inventarios farmacéuticos.',
@@ -96,6 +101,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'primera-infancia',
+    slug: 'auxiliar-en-educacion-para-la-primera-infancia',
     titulo: 'Técnico Laboral en Auxiliar de Educación para la Primera Infancia',
     categoria: 'comercial',
     descripcion: 'Presta servicio de apoyo pedagógico en actividades educativas bajo la supervisión de un educador infantil, orientadas a promover el desarrollo integral de niños y niñas en educación inicial y preescolar.',
@@ -110,10 +116,12 @@ const PROGRAMAS: Program[] = [
     ],
     resolucion: 'Secretaría de Educación Municipal de Montería · Res. 0037 de 15 de enero de 2026',
     color: '#8B5CF6',
-    icon: <BookOpen className="w-6 h-6 text-white" />
+    icon: <BookOpen className="w-6 h-6 text-white" />,
+    imagen: 'https://thkbobesewltcsgnzpay.supabase.co/storage/v1/object/public/programas/auxiliar-en-educacion-para-la-primera-infancia-1788545898700.webp'
   },
   {
     id: 'contable-financiero',
+    slug: 'auxiliar-contable-y-financiero',
     titulo: 'Técnico Laboral en Auxiliar Contable y Financiero',
     categoria: 'comercial',
     descripcion: 'Realiza la medición y reconocimiento de transacciones contables y financieras, liquidación y soporte de impuestos, conciliación bancaria, liquidación de nómina, control presupuestal e inventarios.',
@@ -133,6 +141,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'marketing-comunicacion',
+    slug: 'asistentes-de-marketing-y-comunicacion',
     titulo: 'Técnico Laboral en Asistentes de Marketing y Comunicación',
     categoria: 'comercial',
     descripcion: 'Apoya los procesos y estrategias comerciales en empresas públicas y privadas en áreas de mercadeo digital, publicidad, comunicación corporativa, relaciones públicas y servicio al cliente.',
@@ -152,6 +161,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'deporte-recreacion',
+    slug: 'auxiliar-en-deporte-y-recreacion',
     titulo: 'Técnico Laboral en Auxiliar en Deporte y Recreación',
     categoria: 'comercial',
     descripcion: 'Instruye y dirige personas o grupos en sesiones de acondicionamiento físico, prácticas deportivas y recreativas, fomento de la actividad física y estrategias de promoción de salud y bienestar integral.',
@@ -171,6 +181,7 @@ const PROGRAMAS: Program[] = [
   },
   {
     id: 'admin-organizacional',
+    slug: 'auxiliar-administrativo-organizacional',
     titulo: 'Técnico Laboral en Auxiliar Administrativo Organizacional',
     categoria: 'comercial',
     descripcion: 'Programa integral enfocado en funciones de apoyo administrativo, gestión de talento humano, servicio al cliente, apoyo contable, archivo y manejo de procesos organizacionales bajo normativas vigentes.',
@@ -193,12 +204,37 @@ const PROGRAMAS: Program[] = [
 export default function ProgramsSection() {
   const [filter, setFilter] = useState<'todos' | 'salud' | 'comercial'>('todos');
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [dbData, setDbData] = useState<Record<string, { imagen_url: string | null; activo: boolean }>>({});
+
+  useEffect(() => {
+    supabase
+      .from('programas')
+      .select('slug, imagen_url, activo')
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, { imagen_url: string | null; activo: boolean }> = {};
+          data.forEach((item: { slug: string; imagen_url: string | null; activo: boolean }) => {
+            if (item.slug) {
+              map[item.slug] = {
+                imagen_url: item.imagen_url,
+                activo: item.activo
+              };
+            }
+          });
+          setDbData(map);
+        }
+      });
+  }, []);
 
   const handleImageError = (programId: string) => {
     setImageErrors(prev => ({ ...prev, [programId]: true }));
   };
 
   const filteredPrograms = PROGRAMAS.filter(p => {
+    // Si en Supabase fue ocultado, no mostrar en la web
+    if (dbData[p.slug] && dbData[p.slug].activo === false) {
+      return false;
+    }
     if (filter === 'todos') return true;
     return p.categoria === filter;
   });
@@ -217,7 +253,7 @@ export default function ProgramsSection() {
                 : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
             }`}
           >
-            Todos los Programas ({PROGRAMAS.length})
+            Todos los Programas ({filteredPrograms.length})
           </button>
           <button
             onClick={() => setFilter('salud')}
@@ -227,7 +263,7 @@ export default function ProgramsSection() {
                 : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
             }`}
           >
-            Área de la Salud (5)
+            Área de la Salud (3)
           </button>
           <button
             onClick={() => setFilter('comercial')}
@@ -244,7 +280,8 @@ export default function ProgramsSection() {
         {/* Grilla de Programas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {filteredPrograms.map((program) => {
-            const hasImage = Boolean(program.imagen && !imageErrors[program.id]);
+            const currentImage = dbData[program.slug]?.imagen_url || program.imagen;
+            const hasImage = Boolean(currentImage && !imageErrors[program.id]);
 
             return (
               <div
@@ -257,7 +294,7 @@ export default function ProgramsSection() {
                   <div className="relative w-full aspect-[16/11] rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 border border-slate-200/80 flex items-center justify-center group/img shadow-inner">
                     {hasImage ? (
                       <img
-                        src={program.imagen}
+                        src={currentImage}
                         alt={program.titulo}
                         onError={() => handleImageError(program.id)}
                         className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
