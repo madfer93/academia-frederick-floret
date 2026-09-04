@@ -69,32 +69,6 @@ const PROGRAMS_SCHEMA = {
     {
       "@type": "EducationalOccupationalProgram",
       "position": 4,
-      "name": "Técnico Laboral en Auxiliar Administrativo en Salud",
-      "description": "Admisión de pacientes, facturación médica ante EPS/IPS, trámite de glosas y auditoría en salud.",
-      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
-      "timeToComplete": "P18M",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
-      }
-    },
-    {
-      "@type": "EducationalOccupationalProgram",
-      "position": 5,
-      "name": "Técnico Laboral en Auxiliar en Salud Pública",
-      "description": "Vigilancia epidemiológica comunitaria, brigadas de vacunación y programas gubernamentales de prevención.",
-      "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
-      "timeToComplete": "P18M",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
-      }
-    },
-    {
-      "@type": "EducationalOccupationalProgram",
-      "position": 6,
       "name": "Técnico Laboral en Auxiliar de Educación para la Primera Infancia",
       "description": "Apoyo en actividades educativas bajo la supervisión de un educador infantil, orientadas a promover el desarrollo integral en la educación inicial y preescolar.",
       "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
@@ -107,7 +81,7 @@ const PROGRAMS_SCHEMA = {
     },
     {
       "@type": "EducationalOccupationalProgram",
-      "position": 7,
+      "position": 5,
       "name": "Técnico Laboral en Auxiliar Contable y Financiero",
       "description": "Medición y reconocimiento de transacciones contables, conciliaciones bancarias, liquidación de nómina, impuestos y costos empresariales.",
       "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
@@ -120,7 +94,7 @@ const PROGRAMS_SCHEMA = {
     },
     {
       "@type": "EducationalOccupationalProgram",
-      "position": 8,
+      "position": 6,
       "name": "Técnico Laboral en Asistentes de Marketing y Comunicación",
       "description": "Apoyo en departamentos de mercadeo, publicidad, diseño de campañas de comunicación corporativa y servicio al cliente.",
       "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
@@ -133,7 +107,7 @@ const PROGRAMS_SCHEMA = {
     },
     {
       "@type": "EducationalOccupationalProgram",
-      "position": 9,
+      "position": 7,
       "name": "Técnico Laboral en Auxiliar en Deporte y Recreación",
       "description": "Entrenamiento físico, preparación deportiva, dirección de grupos recreativos y fomento de hábitos de vida saludable.",
       "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
@@ -146,7 +120,7 @@ const PROGRAMS_SCHEMA = {
     },
     {
       "@type": "EducationalOccupationalProgram",
-      "position": 10,
+      "position": 8,
       "name": "Técnico Laboral en Auxiliar Administrativo Organizacional",
       "description": "Gestión empresarial, servicio al cliente, apoyo contable, nómina y talento humano con 660 horas certificadas.",
       "educationalCredentialAwarded": "Certificado de Aptitud Ocupacional de Técnico Laboral",
