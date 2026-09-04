@@ -177,28 +177,44 @@ export default function ChatBubble() {
       const data = await response.json();
       let replyContent = data.reply || 'Disculpa, no pude procesar tu consulta en este momento. Por favor contáctanos al WhatsApp 320 520 6613.';
 
-      // Detectar si la IA capturó un lead para enviarlo al CRM y Q10
+      // Detectar si la IA capturó un lead para enviarlo al CRM, Telegram y Q10
       const leadMatch = replyContent.match(/<!--LEAD_CAPTURED:(.*?)-->/);
       if (leadMatch && leadMatch[1]) {
         try {
           const leadData = JSON.parse(leadMatch[1]);
-          // Enviar silenciosamente al endpoint de CRM & Q10
           fetch('/api/lead', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               nombres: leadData.nombres || 'Aspirante',
               telefono: leadData.telefono,
-              programa_interes: leadData.programa || 'Auxiliar en Enfermería',
+              programa_interes: leadData.programa || 'Interés General',
+              mensaje: leadData.mensaje || 'Prospecto capturado durante la conversación con la IA',
               origen: `Chat IA 24/7 (${botConfig.nombre})`
             })
-          });
+          }).catch((e) => console.warn('[Lead Dispatch Error]:', e));
           setLeadRegistered(true);
         } catch (e) {
           console.warn('Error parseando lead:', e);
         }
-        // Limpiar el tag de la respuesta visible
         replyContent = replyContent.replace(/<!--LEAD_CAPTURED:(.*?)-->/, '').trim();
+      }
+
+      // Detectar si el usuario solicitó expresamente asesor humano
+      const advisorMatch = replyContent.match(/<!--ASESOR_REQUEST:(.*?)-->/);
+      if (advisorMatch) {
+        fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombres: 'Usuario en Chat Web',
+            telefono: 'Pendiente en chat',
+            programa_interes: 'Solicitud de Asesoría Humana',
+            mensaje: `El usuario solicitó hablar con un asesor humano en vivo. Mensaje: "${text.slice(0, 250)}"`,
+            origen: `Chat IA 24/7 (Alerta Asesor)`
+          })
+        }).catch((e) => console.warn('[Advisor Alert Error]:', e));
+        replyContent = replyContent.replace(/<!--ASESOR_REQUEST:(.*?)-->/, '').trim();
       }
 
       setMessages(prev => [
@@ -220,9 +236,10 @@ export default function ChatBubble() {
   };
 
   const QUICK_QUESTIONS = [
-    '¿Cuáles son los 6 programas?',
+    '¿Cuáles son los programas técnicos disponibles?',
     '¿Cómo funciona el pago en 4 cuotas?',
     '¿Qué requisitos exigen?',
+    'Quiero hablar con un asesor',
     '¿Dónde queda la sede en Montería?'
   ];
 

@@ -107,6 +107,29 @@ export default function AdmissionForm() {
         throw new Error('No se pudo guardar la inscripción. Por favor inténtalo de nuevo o contáctanos por WhatsApp.');
       }
 
+      // Notificar de inmediato al grupo de Telegram directivo y CRM
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombres: formData.nombres.trim(),
+          apellidos: formData.apellidos.trim(),
+          tipo_documento: formData.tipo_documento,
+          documento: formData.documento.trim(),
+          telefono: formData.telefono.trim(),
+          email: formData.email.trim() || null,
+          programa_interes: formData.programa_interes,
+          jornada_interes: formData.jornada_interes,
+          nivel_educativo: formData.nivel_educativo,
+          mensaje: formData.mensaje.trim() || null,
+          origen: 'Formulario Web Oficial',
+          acudiente_nombre: formData.tipo_documento === 'TI' ? formData.acudiente_nombre.trim() : undefined,
+          acudiente_documento: formData.tipo_documento === 'TI' ? formData.acudiente_documento.trim() : undefined,
+          acudiente_telefono: formData.tipo_documento === 'TI' ? formData.acudiente_telefono.trim() : undefined,
+          acudiente_parentesco: formData.tipo_documento === 'TI' ? formData.acudiente_parentesco : undefined,
+        })
+      }).catch((e) => console.warn('[Telegram Lead Notify Error]:', e));
+
       setSuccess(true);
     } catch (err: unknown) {
       const error = err as Error;

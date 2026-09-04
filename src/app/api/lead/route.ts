@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { syncLeadToQ10 } from '@/lib/q10';
+import { sendTelegramAlert, formatLeadAlert } from '@/lib/telegram';
 
 // In-memory rate limiter (máximo 10 registros por 5 minutos por IP)
 const leadRateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -91,11 +92,30 @@ export async function POST(req: Request) {
       origen,
     });
 
+    // 3. Notificación Inmediata al Grupo de Telegram Directivo
+    sendTelegramAlert(formatLeadAlert({
+      nombres,
+      apellidos,
+      tipo_documento: body.tipo_documento,
+      documento: body.documento,
+      telefono,
+      email,
+      programa_interes,
+      jornada_interes,
+      nivel_educativo: body.nivel_educativo,
+      mensaje,
+      origen,
+      acudiente_nombre: body.acudiente_nombre,
+      acudiente_documento: body.acudiente_documento,
+      acudiente_telefono: body.acudiente_telefono,
+      acudiente_parentesco: body.acudiente_parentesco,
+    })).catch((err) => console.error('[Telegram Lead Notification Error]:', err));
+
     return NextResponse.json({
       success: true,
       lead_id: dbData?.id || null,
       q10_sync: q10Result,
-      message: 'Prospecto registrado exitosamente en el CRM administrativo y preparado para Q10.'
+      message: 'Prospecto registrado exitosamente en el CRM administrativo, enviado a Telegram y preparado para Q10.'
     });
   } catch (err: any) {
     console.error('[Lead API Exception]:', err);

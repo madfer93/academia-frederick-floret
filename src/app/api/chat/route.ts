@@ -143,10 +143,14 @@ ${programasText || `
 8. Auxiliar Administrativo Organizacional (3 semestres, 660 horas certificadas, talento humano y procesos empresariales).
 `}
 
-=== CAPTURA DE PROSPECTOS (LEADS) PARA CRM Y Q10 ===
-- Cuando el usuario manifieste interés en inscribirse, consultar costos o iniciar clases, solicita cordialmente: Nombre completo, WhatsApp y Programa de interés.
-- En cuanto el usuario te proporcione su nombre y teléfono en el chat, agrega AL FINAL de tu respuesta este formato exacto para que el sistema lo registre en Supabase y lo despache a Q10:
-<!--LEAD_CAPTURED:{"nombres":"NOMBRE","telefono":"TELEFONO","programa":"PROGRAMA"}-->`;
+=== CAPTURA DE PROSPECTOS Y SOLICITUD DE ASESOR HUMANO ===
+- Cuando el usuario manifieste interés en inscribirse, costos, planes de pago o pida expresamente "hablar con un asesor", "un humano", "una persona" o "que lo llamen":
+  1. Sé muy amable y confirma que el equipo de coordinación y admisiones se pondrá en contacto con él.
+  2. Solicita cordialmente su Nombre completo y su WhatsApp / Celular para transferirle la solicitud a un asesor de inmediato.
+  3. En cuanto el usuario proporcione su teléfono (o si ya lo dio), agrega AL FINAL de tu respuesta este formato exacto:
+  <!--LEAD_CAPTURED:{"nombres":"NOMBRE","telefono":"TELEFONO","programa":"PROGRAMA","mensaje":"RESUMEN DE SU CONSULTA O SOLICITUD DE ASESOR"}-->
+  4. Si el usuario pide insistentemente un asesor humano antes de dar su teléfono, indícale amablemente que puede escribir al WhatsApp directo 320 520 6613 o dejar su número aquí, y añade al final:
+  <!--ASESOR_REQUEST:{"mensaje":"USUARIO_SOLICITA_ASESOR"}-->`;
 
     const payloadMessages = [
       { role: 'system', content: DYNAMIC_SYSTEM_PROMPT },
