@@ -33,10 +33,14 @@ export default function AdminGaleriaPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Tabla galeria_fotos pendiente de creación en Supabase. Se mostrarán fotos locales.');
+        setFotos([]);
+        return;
+      }
       setFotos((data as Foto[]) || []);
     } catch (err) {
-      console.error('Error cargando galería:', err);
+      console.warn('Conexión con tabla galeria_fotos pendiente:', err);
     } finally {
       setLoading(false);
     }

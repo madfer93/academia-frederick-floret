@@ -322,7 +322,7 @@ export default function ChatBubble() {
                     className={`max-w-[82%] p-3 rounded-2xl leading-relaxed shadow-xs ${
                       isUser
                         ? 'bg-gradient-to-r from-[#D51C28] to-[#FF8C01] text-white rounded-tr-xs'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs'
+                        : 'bg-white border border-slate-200 text-slate-900 rounded-tl-xs'
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{m.content}</div>
@@ -477,7 +477,7 @@ export default function ChatBubble() {
                   ? "Escribe tu consulta o pide requisitos..."
                   : "Acepta las políticas arriba para chatear..."
               }
-              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-400"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 placeholder:text-slate-500 font-medium focus:ring-2 focus:ring-[#D51C28] focus:border-[#D51C28] outline-hidden bg-white shadow-xs disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-400"
             />
             <button
               type="submit"

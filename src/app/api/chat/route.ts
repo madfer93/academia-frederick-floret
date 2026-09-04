@@ -138,7 +138,7 @@ ${programasText || `
       ...sanitizedMessages
     ];
 
-    // 3. CONSULTAR GROQ (Llama 3.3 70B con fallback a 3.1 8B)
+    // 3. CONSULTAR GROQ (GPT-OSS 120B con fallback a GPT-OSS 20B)
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -146,7 +146,7 @@ ${programasText || `
         'Authorization': `Bearer ${groqApiKey}`,
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         messages: payloadMessages,
         temperature: 0.3,
         max_tokens: 600,
@@ -154,7 +154,7 @@ ${programasText || `
     });
 
     if (!response.ok) {
-      console.warn('[Groq Primary Model busy, executing fallback 8b]');
+      console.warn('[Groq Primary Model busy, executing fallback 20b]');
       const fallbackResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -162,7 +162,7 @@ ${programasText || `
           'Authorization': `Bearer ${groqApiKey}`,
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: 'openai/gpt-oss-20b',
           messages: payloadMessages,
           temperature: 0.3,
           max_tokens: 500,
