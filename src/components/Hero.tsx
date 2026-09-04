@@ -23,7 +23,7 @@ export default function Hero() {
 
             {/* Titular Impactante */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.1]">
-              34 Años Formando Técnicos de Excelencia en <span className="bg-gradient-to-r from-[#D51C28] to-[#FF8C01] bg-clip-text text-transparent">Montería y Córdoba</span>
+              35 Años Formando Técnicos de Excelencia en <span className="bg-gradient-to-r from-[#D51C28] to-[#FF8C01] bg-clip-text text-transparent">Montería y Córdoba</span>
             </h1>
 
             {/* Slogan Histórico Oficial */}
@@ -106,7 +106,7 @@ export default function Hero() {
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
                     <div className="flex items-center gap-2 text-[#D51C28]">
                       <Award className="w-5 h-5" />
-                      <span className="text-2xl font-black text-slate-900">34</span>
+                      <span className="text-2xl font-black text-slate-900">35</span>
                     </div>
                     <p className="text-xs font-semibold text-slate-600 mt-1">Años de Servicio</p>
                   </div>
@@ -114,7 +114,7 @@ export default function Hero() {
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
                     <div className="flex items-center gap-2 text-blue-600">
                       <BookOpen className="w-5 h-5" />
-                      <span className="text-2xl font-black text-slate-900">6</span>
+                      <span className="text-2xl font-black text-slate-900">8</span>
                     </div>
                     <p className="text-xs font-semibold text-slate-600 mt-1">Programas Técnicos</p>
                   </div>

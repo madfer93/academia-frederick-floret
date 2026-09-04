@@ -117,6 +117,53 @@ export default function AdminProgramasPage() {
     }
   };
 
+  // Alternar visibilidad (Ocultar/Mostrar) con guardado instantáneo en Supabase
+  const handleToggleVisibility = async (prog: ProgramDB) => {
+    const nextState = !prog.activo;
+    handleChange(prog.id, 'activo', nextState);
+    try {
+      const { error } = await supabase
+        .from('programas')
+        .update({ activo: nextState })
+        .eq('id', prog.id);
+
+      if (error) throw error;
+      setSuccessMsg(
+        nextState 
+          ? `✓ "${prog.titulo}" ahora es VISIBLE en la página web.`
+          : `👁️ "${prog.titulo}" ha sido OCULTADO de la página web.`
+      );
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err: unknown) {
+      handleChange(prog.id, 'activo', prog.activo); // Revertir en caso de error
+      const error = err as Error;
+      setErrorMsg(error.message || 'Error actualizando visibilidad del programa.');
+    }
+  };
+
+  // Eliminar definitivamente un programa de la base de datos
+  const handleDeleteProgram = async (prog: ProgramDB) => {
+    const confirmed = window.confirm(
+      `¿Estás seguro de ELIMINAR definitivamente el programa "${prog.titulo}"?\n\nEsta acción borrará el registro de la base de datos.\nSi solo deseas que no aparezca en la página web, puedes pulsar "Ocultar".`
+    );
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('programas')
+        .delete()
+        .eq('id', prog.id);
+
+      if (error) throw error;
+      setPrograms(prev => prev.filter(p => p.id !== prog.id));
+      setSuccessMsg(`Programa "${prog.titulo}" eliminado exitosamente de la base de datos.`);
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err: unknown) {
+      const error = err as Error;
+      setErrorMsg(error.message || 'Error eliminando el programa.');
+    }
+  };
+
   const handleSave = async (prog: ProgramDB) => {
     setSavingId(prog.id);
     setSuccessMsg('');
@@ -217,27 +264,39 @@ export default function AdminProgramasPage() {
                   </h3>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleChange(prog.id, 'activo', !prog.activo)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-colors cursor-pointer self-start ${
-                    prog.activo
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {prog.activo ? (
-                    <>
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Visible en Web</span>
-                    </>
-                  ) : (
-                    <>
-                      <EyeOff className="w-3.5 h-3.5" />
-                      <span>Oculto</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex items-center gap-2 self-start">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleVisibility(prog)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs ${
+                      prog.activo
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                    }`}
+                    title={prog.activo ? "Clic para ocultar de la web" : "Clic para mostrar en la web"}
+                  >
+                    {prog.activo ? (
+                      <>
+                        <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Visible en Web</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Oculto de la Web</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProgram(prog)}
+                    className="p-1.5 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-colors cursor-pointer"
+                    title="Eliminar programa definitivamente"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Fila con Foto a la izquierda y Datos a la derecha */}

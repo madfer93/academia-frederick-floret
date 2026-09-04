@@ -131,16 +131,6 @@ export default function Footer() {
                   Servicios Farmacéuticos
                 </Link>
               </li>
-              <li>
-                <Link href="/programas" className="hover:text-white transition-colors">
-                  Administrativo en Salud
-                </Link>
-              </li>
-              <li>
-                <Link href="/programas" className="hover:text-white transition-colors">
-                  Auxiliar en Salud Pública
-                </Link>
-              </li>
             </ul>
           </div>
 

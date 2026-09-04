@@ -15,7 +15,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://academia-frederick-floret.vercel.app'),
   title: 'Academia Frederick Floret | Educación Técnica Montería',
-  description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas, crédito directo y 34 años de trayectoria oficial.',
+  description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas, crédito directo y 35 años de trayectoria oficial.',
   alternates: {
     canonical: 'https://academia-frederick-floret.vercel.app',
   },
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   openGraph: {
     title: 'Academia Frederick Floret | Educación Técnica Montería',
-    description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas y 34 años de experiencia.',
+    description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas y 35 años de experiencia.',
     type: 'website',
     locale: 'es_CO',
     url: 'https://academia-frederick-floret.vercel.app',

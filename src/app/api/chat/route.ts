@@ -126,7 +126,7 @@ ${configuracionText || `
 - Direccion Sede: Calle 27 #10-21, Edificio Frederick Floret, Centro de Montería, Córdoba.
 - Telefono y WhatsApp Oficial: 320 520 6613.
 - Horarios de Atencion: Lunes a Viernes de 7:30 am a 12:00 m y 2:00 pm a 6:00 pm. Sábados de 8:00 am a 1:00 pm.
-- Trayectoria: 34 años de liderazgo (Fundada en 1991 mediante Licencia de Funcionamiento 001514).
+- Trayectoria: 35 años de liderazgo (Fundada en 1991 mediante Licencia de Funcionamiento 001514).
 - Instalaciones: Edificio propio de 3 plantas, 353 m², sala con 80 computadores y laboratorios clínicos simulados.
 - Financiacion: Crédito institucional directo en 4 cuotas mensuales sin cobro de intereses bancarios.
 `}
@@ -136,9 +136,11 @@ ${programasText || `
 1. Auxiliar en Enfermería (3 semestres, 50% práctico en clínicas y hospitales, avalado MinSalud/MEN Rad. 200478261).
 2. Auxiliar en Salud Oral (3 semestres, asistencia odontológica y esterilización).
 3. Auxiliar en Servicios Farmacéuticos (3 semestres, dispensación y normatividad Invima).
-4. Auxiliar Administrativo en Salud (3 semestres, facturación médica y admisión).
-5. Auxiliar en Salud Pública (3 semestres, brigadas comunitarias y vigilancia).
-6. Auxiliar Administrativo Organizacional (3 semestres, 660 horas certificadas, nómina y talento humano).
+4. Auxiliar de Educación para la Primera Infancia (3 semestres, pedagogía infantil y estimulación).
+5. Auxiliar Contable y Financiero (3 semestres, contabilidad, nómina e impuestos).
+6. Asistentes de Marketing y Comunicación (3 semestres, marketing digital y publicidad).
+7. Auxiliar en Deporte y Recreación (3 semestres, acondicionamiento físico y recreación deportiva).
+8. Auxiliar Administrativo Organizacional (3 semestres, 660 horas certificadas, talento humano y procesos empresariales).
 `}
 
 === CAPTURA DE PROSPECTOS (LEADS) PARA CRM Y Q10 ===

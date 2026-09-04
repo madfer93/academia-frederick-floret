@@ -20,7 +20,7 @@ export default function Navbar() {
             <span className="hidden md:inline text-slate-300">Resolución SEM 0990 de 2022 · MinSalud Rad. 200478261</span>
           </div>
           <div className="flex items-center gap-4 text-slate-300">
-            <span className="font-semibold text-amber-400">✨ 34 Años Educando a Córdoba</span>
+            <span className="font-semibold text-amber-400">✨ 35 Años Educando a Córdoba</span>
             <span className="hidden sm:inline text-slate-600">|</span>
             <a 
               href="https://wa.me/573205206613?text=Hola,%20deseo%20informaci%C3%B3n%20sobre%20las%20inscripciones%20en%20Academia%20Frederick%20Floret" 
@@ -48,7 +48,7 @@ export default function Navbar() {
           <div className="border-l border-slate-200 pl-3 hidden sm:block">
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] font-bold bg-red-100 text-[#D51C28] px-2 py-0.5 rounded-full">
-                34 AÑOS · DESDE 1991
+                35 AÑOS · DESDE 1991
               </span>
             </div>
             <p className="text-[11px] font-semibold text-slate-500 tracking-wider uppercase mt-0.5">

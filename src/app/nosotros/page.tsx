@@ -7,13 +7,13 @@ import Link from 'next/link';
 import { Award, ShieldCheck, Scale, CheckCircle2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Nuestra Institución | 34 Años de Trayectoria en Montería',
+  title: 'Nuestra Institución | 35 Años de Trayectoria en Montería',
   description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
   alternates: {
     canonical: 'https://academia-frederick-floret.vercel.app/nosotros',
   },
   openGraph: {
-    title: 'Nuestra Institución | 34 Años de Trayectoria en Montería',
+    title: 'Nuestra Institución | 35 Años de Trayectoria en Montería',
     description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
     url: 'https://academia-frederick-floret.vercel.app/nosotros',
     type: 'website',
@@ -39,7 +39,7 @@ const NOSOTROS_SCHEMA = {
       "addressCountry": "CO"
     },
     "slogan": "Formando el hombre del futuro, educamos con amor, calidad y eficiencia",
-    "knowsAbout": ["Auxiliar en Enfermería", "Auxiliar en Salud Oral", "Servicios Farmacéuticos", "Administrativo en Salud", "Auxiliar Administrativo"]
+    "knowsAbout": ["Auxiliar en Enfermería", "Auxiliar en Salud Oral", "Servicios Farmacéuticos", "Auxiliar Administrativo Organizacional"]
   }
 };
 
@@ -61,7 +61,7 @@ export default function NosotrosPage() {
             <Award className="w-3.5 h-3.5" /> Trayectoria Desde 1991
           </span>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
-            34 Años Educando con Amor, Calidad y Eficiencia
+            35 Años Educando con Amor, Calidad y Eficiencia
           </h1>
           <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
             Nuestra institución se consolidó como el referente de formación técnica laboral de Montería y Córdoba, articulando la teoría con la práctica ocupacional directa.

@@ -95,42 +95,6 @@ const PROGRAMAS: Program[] = [
     imagen: '/programas/auxiliar-en-servicios-farmaceuticos.webp'
   },
   {
-    id: 'admin-salud',
-    titulo: 'Técnico Laboral en Auxiliar Administrativo en Salud',
-    categoria: 'salud',
-    descripcion: 'Domina los procesos de admisión de pacientes, verificación de derechos y autorizaciones ante EPS, facturación de servicios de salud bajo normativa colombiana y manejo de historias clínicas.',
-    duracion: '3 Semestres',
-    modalidad: 'Presencial (50% Teórico · 50% Práctico)',
-    jornadas: ['Mañana', 'Tarde', 'Nocturna', 'Sábados'],
-    salidas: [
-      'Áreas de facturación y cuentas médicas en EPS/IPS',
-      'Admisiones, recepción y orientación al usuario',
-      'Auditoría médica básica y trámite de glosas',
-      'Gestión documental y archivo en salud'
-    ],
-    resolucion: 'Secretaría de Educación Municipal de Montería · Res. 0990 de 2022',
-    color: '#E3087E',
-    icon: <FileSpreadsheet className="w-6 h-6 text-white" />
-  },
-  {
-    id: 'salud-publica',
-    titulo: 'Técnico Laboral en Auxiliar en Salud Pública',
-    categoria: 'salud',
-    descripcion: 'Prepárate para liderar brigadas de salud comunitaria, planes de inmunización, vigilancia epidemiológica comunitaria y campañas de promoción y prevención (PyP) en el departamento de Córdoba.',
-    duracion: '3 Semestres',
-    modalidad: 'Presencial (50% Teórico · 50% Práctico)',
-    jornadas: ['Mañana', 'Tarde', 'Nocturna', 'Sábados'],
-    salidas: [
-      'Secretarías de Salud municipal y departamental',
-      'Equipos de vigilancia epidemiológica comunitaria',
-      'Programas gubernamentales de promoción y prevención (PyP)',
-      'Organizaciones no gubernamentales (ONG) en salud'
-    ],
-    resolucion: 'Comisión Intersectorial MinSalud / MEN Rad. 200478261',
-    color: '#FF8C01',
-    icon: <ShieldPlus className="w-6 h-6 text-white" />
-  },
-  {
     id: 'primera-infancia',
     titulo: 'Técnico Laboral en Auxiliar de Educación para la Primera Infancia',
     categoria: 'comercial',

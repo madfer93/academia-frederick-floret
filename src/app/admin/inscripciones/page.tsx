@@ -30,6 +30,10 @@ interface Lead {
   mensaje: string | null;
   estado: string;
   created_at: string;
+  acudiente_nombre?: string | null;
+  acudiente_documento?: string | null;
+  acudiente_telefono?: string | null;
+  acudiente_parentesco?: string | null;
 }
 
 export default function AdminInscripcionesPage() {
@@ -114,6 +118,10 @@ export default function AdminInscripcionesPage() {
       'Programa de Interés',
       'Jornada',
       'Nivel Educativo',
+      'Acudiente Nombre',
+      'Acudiente Documento',
+      'Acudiente Teléfono',
+      'Acudiente Parentesco',
       'Estado',
       'Mensaje'
     ];
@@ -130,6 +138,10 @@ export default function AdminInscripcionesPage() {
       `"${l.programa_interes.replace(/"/g, '""')}"`,
       `"${(l.jornada_interes || '').replace(/"/g, '""')}"`,
       `"${(l.nivel_educativo || '').replace(/"/g, '""')}"`,
+      `"${(l.acudiente_nombre || '').replace(/"/g, '""')}"`,
+      `"${(l.acudiente_documento || '').replace(/"/g, '""')}"`,
+      `"${(l.acudiente_telefono || '').replace(/"/g, '""')}"`,
+      `"${(l.acudiente_parentesco || '').replace(/"/g, '""')}"`,
       l.estado || 'pendiente',
       `"${(l.mensaje || '').replace(/"/g, '""')}"`
     ]);
@@ -229,8 +241,10 @@ export default function AdminInscripcionesPage() {
             <option value="Auxiliar en Enfermería">Auxiliar en Enfermería</option>
             <option value="Auxiliar en Salud Oral">Auxiliar en Salud Oral</option>
             <option value="Auxiliar en Servicios Farmacéuticos">Servicios Farmacéuticos</option>
-            <option value="Auxiliar Administrativo en Salud">Administrativo en Salud</option>
-            <option value="Auxiliar en Salud Pública">Auxiliar en Salud Pública</option>
+            <option value="Auxiliar de Educación para la Primera Infancia">Educación Primera Infancia</option>
+            <option value="Auxiliar Contable y Financiero">Contable y Financiero</option>
+            <option value="Asistentes de Marketing y Comunicación">Marketing y Comunicación</option>
+            <option value="Auxiliar en Deporte y Recreación">Deporte y Recreación</option>
             <option value="Auxiliar Administrativo Organizacional">Auxiliar Organizacional</option>
           </select>
         </div>
@@ -276,14 +290,46 @@ export default function AdminInscripcionesPage() {
                         </div>
                       )}
                     </td>
-                    <td className="py-4 px-5 font-mono text-[11px]">
-                      {lead.tipo_documento} {lead.documento}
+                    <td className="py-4 px-5 align-top">
+                      <div className="font-mono text-[11px] font-semibold text-slate-800">
+                        {lead.tipo_documento} {lead.documento}
+                      </div>
+
+                      {/* Tag Menor de Edad y Datos del Acudiente */}
+                      {(lead.tipo_documento === 'TI' || lead.acudiente_nombre) && (
+                        <div className="mt-2 p-2 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-950 text-[11px] space-y-1">
+                          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-200/80 text-amber-900 font-black text-[9px] uppercase tracking-wider">
+                            🛡️ Acudiente ({lead.acudiente_parentesco || 'Tutor'})
+                          </div>
+                          <div className="font-bold text-slate-900">
+                            {lead.acudiente_nombre || 'Registrado en observaciones'}
+                          </div>
+                          {lead.acudiente_documento && (
+                            <div className="text-[10px] text-slate-600">
+                              C.C. {lead.acudiente_documento}
+                            </div>
+                          )}
+                          {lead.acudiente_telefono && (
+                            <div className="pt-0.5">
+                              <a
+                                href={`https://wa.me/57${lead.acudiente_telefono.replace(/\D/g, '')}?text=Hola,%20te%20saludamos%20desde%20la%20Academia%20Frederick%20Floret%20respecto%20a%20la%20inscripci%C3%B3n%20de%20tu%20acudido%20${encodeURIComponent(lead.nombres)}.`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 hover:text-emerald-800 underline"
+                              >
+                                <Phone className="w-2.5 h-2.5" />
+                                <span>{lead.acudiente_telefono} (WhatsApp)</span>
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td className="py-4 px-5">
                       <div className="font-semibold text-slate-800">{lead.programa_interes}</div>
                       <div className="text-[10px] text-slate-400 mt-0.5">{lead.jornada_interes || 'Sin jornada'}</div>
                       {lead.mensaje && (
-                        <div className="text-[10px] text-slate-500 italic mt-1 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+                        <div className="text-[10px] text-slate-500 italic mt-1 bg-slate-50 p-1.5 rounded-lg border border-slate-100 max-w-xs whitespace-pre-wrap">
                           &ldquo;{lead.mensaje}&rdquo;
                         </div>
                       )}

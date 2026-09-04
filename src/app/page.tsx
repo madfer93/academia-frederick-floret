@@ -41,22 +41,36 @@ const QUICK_PROGRAMS = [
     desc: 'Dispensación técnica, control de inventarios y normatividad Invima.'
   },
   {
-    titulo: 'Administrativo en Salud',
-    categoria: 'Área Salud',
-    color: '#E3087E',
+    titulo: 'Educación Primera Infancia',
+    categoria: 'Área Comercial',
+    color: '#8B5CF6',
+    icon: <GraduationCap className="w-5 h-5 text-white" />,
+    desc: 'Apoyo pedagógico y desarrollo integral en jardines, preescolares y CDIs.'
+  },
+  {
+    titulo: 'Contable y Financiero',
+    categoria: 'Área Comercial',
+    color: '#1E40AF',
     icon: <FileSpreadsheet className="w-5 h-5 text-white" />,
-    desc: 'Facturación de cuentas médicas, admisiones EPS/IPS y gestión de historias clínicas.'
+    desc: 'Cuentas por pagar, liquidación de nómina, conciliación y compras.'
   },
   {
-    titulo: 'Auxiliar en Salud Pública',
-    categoria: 'Área Salud',
-    color: '#FF8C01',
-    icon: <ShieldPlus className="w-5 h-5 text-white" />,
-    desc: 'Vigilancia epidemiológica, planes de vacunación y brigadas comunitarias.'
+    titulo: 'Marketing y Comunicación',
+    categoria: 'Área Comercial',
+    color: '#15803D',
+    icon: <ShieldCheck className="w-5 h-5 text-white" />,
+    desc: 'Marketing digital, ventas comerciales, publicidad y atención al cliente.'
   },
   {
-    titulo: 'Auxiliar Administrativo Organizacional',
-    categoria: 'Área Empresarial',
+    titulo: 'Deporte y Recreación',
+    categoria: 'Área Comercial',
+    color: '#D97706',
+    icon: <HeartPulse className="w-5 h-5 text-white" />,
+    desc: 'Acondicionamiento físico, escuelas deportivas y centros recreacionales.'
+  },
+  {
+    titulo: 'Administrativo Organizacional',
+    categoria: 'Área Comercial',
     color: '#334155',
     icon: <Briefcase className="w-5 h-5 text-white" />,
     desc: 'Gestión empresarial, talento humano, nómina, servicio al cliente y 660 horas.'
@@ -81,7 +95,7 @@ export default function Home() {
                 Formación Técnica Laboral
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-                Nuestros 10 Programas Técnicos Laborales
+                Nuestros 8 Programas Técnicos Laborales
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
                 3 semestres de formación presencial con 50% de horas prácticas orientadas a las exigencias laborales de Montería.
@@ -173,7 +187,7 @@ export default function Home() {
             
             <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
               <ShieldCheck className="w-7 h-7 text-[#D51C28]" />
-              <h3 className="font-bold text-slate-900 text-sm">34 Años de Respaldo</h3>
+              <h3 className="font-bold text-slate-900 text-sm">35 Años de Respaldo</h3>
               <p className="text-slate-600 leading-relaxed">
                 Licencia de funcionamiento 001514 y aval del Ministerio de Salud. Más de dos mil técnicos graduados.
               </p>

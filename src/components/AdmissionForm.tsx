@@ -2,14 +2,12 @@
 
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Send, CheckCircle2, AlertCircle, MessageSquare, PhoneCall } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, MessageSquare, PhoneCall, ShieldAlert, UserCheck } from 'lucide-react';
 
 const PROGRAMAS_OPTIONS = [
   'Técnico Laboral en Auxiliar en Enfermería',
   'Técnico Laboral en Auxiliar en Salud Oral',
   'Técnico Laboral en Auxiliar en Servicios Farmacéuticos',
-  'Técnico Laboral en Auxiliar Administrativo en Salud',
-  'Técnico Laboral en Auxiliar en Salud Pública',
   'Técnico Laboral en Auxiliar de Educación para la Primera Infancia',
   'Técnico Laboral en Auxiliar Contable y Financiero',
   'Técnico Laboral en Asistentes de Marketing y Comunicación',
@@ -28,7 +26,11 @@ export default function AdmissionForm() {
     programa_interes: PROGRAMAS_OPTIONS[0],
     jornada_interes: 'Diurna (Mañana)',
     nivel_educativo: 'Bachiller Completo',
-    mensaje: ''
+    mensaje: '',
+    acudiente_nombre: '',
+    acudiente_documento: '',
+    acudiente_telefono: '',
+    acudiente_parentesco: 'Padre / Madre'
   });
 
   const [loading, setLoading] = useState(false);
@@ -47,24 +49,61 @@ export default function AdmissionForm() {
     setLoading(true);
     setErrorMsg('');
 
-    try {
-      const { error } = await supabase.from('inscripciones').insert([
-        {
-          nombres: formData.nombres.trim(),
-          apellidos: formData.apellidos.trim(),
-          tipo_documento: formData.tipo_documento,
-          documento: formData.documento.trim(),
-          telefono: formData.telefono.trim(),
-          email: formData.email.trim() || null,
-          programa_interes: formData.programa_interes,
-          jornada_interes: formData.jornada_interes,
-          nivel_educativo: formData.nivel_educativo,
-          mensaje: formData.mensaje.trim() || null
-        }
-      ]);
+    // Validación acudiente si es menor con T.I.
+    if (formData.tipo_documento === 'TI') {
+      if (!formData.acudiente_nombre.trim() || !formData.acudiente_documento.trim() || !formData.acudiente_telefono.trim()) {
+        setErrorMsg('Por favor completa todos los datos obligatorios del acudiente o tutor legal.');
+        setLoading(false);
+        return;
+      }
+    }
 
-      if (error) {
-        console.error('Error insertando en Supabase:', error);
+    try {
+      let notasMensaje = formData.mensaje.trim();
+      if (formData.tipo_documento === 'TI') {
+        const acudienteInfo = `[DATOS DEL ACUDIENTE / TUTOR LEGAL]: ${formData.acudiente_nombre.trim()} | Doc: ${formData.acudiente_documento.trim()} | Tel: ${formData.acudiente_telefono.trim()} | Parentesco: ${formData.acudiente_parentesco}`;
+        notasMensaje = notasMensaje ? `${notasMensaje}\n\n${acudienteInfo}` : acudienteInfo;
+      }
+
+      const basePayload: Record<string, unknown> = {
+        nombres: formData.nombres.trim(),
+        apellidos: formData.apellidos.trim(),
+        tipo_documento: formData.tipo_documento,
+        documento: formData.documento.trim(),
+        telefono: formData.telefono.trim(),
+        email: formData.email.trim() || null,
+        programa_interes: formData.programa_interes,
+        jornada_interes: formData.jornada_interes,
+        nivel_educativo: formData.nivel_educativo,
+        mensaje: notasMensaje || null
+      };
+
+      let insertError = null;
+
+      // Intentar insertar con columnas dedicadas si es TI
+      if (formData.tipo_documento === 'TI') {
+        const fullPayload = {
+          ...basePayload,
+          acudiente_nombre: formData.acudiente_nombre.trim(),
+          acudiente_documento: formData.acudiente_documento.trim(),
+          acudiente_telefono: formData.acudiente_telefono.trim(),
+          acudiente_parentesco: formData.acudiente_parentesco
+        };
+        const res = await supabase.from('inscripciones').insert([fullPayload]);
+        insertError = res.error;
+      } else {
+        const res = await supabase.from('inscripciones').insert([basePayload]);
+        insertError = res.error;
+      }
+
+      // Si falla por columna no existente en schema cache, reintentar con basePayload seguro
+      if (insertError && formData.tipo_documento === 'TI') {
+        const retryRes = await supabase.from('inscripciones').insert([basePayload]);
+        insertError = retryRes.error;
+      }
+
+      if (insertError) {
+        console.error('Error insertando en Supabase:', insertError);
         throw new Error('No se pudo guardar la inscripción. Por favor inténtalo de nuevo o contáctanos por WhatsApp.');
       }
 
@@ -182,7 +221,11 @@ export default function AdmissionForm() {
                           programa_interes: PROGRAMAS_OPTIONS[0],
                           jornada_interes: 'Diurna (Mañana)',
                           nivel_educativo: 'Bachiller Completo',
-                          mensaje: ''
+                          mensaje: '',
+                          acudiente_nombre: '',
+                          acudiente_documento: '',
+                          acudiente_telefono: '',
+                          acudiente_parentesco: 'Padre / Madre'
                         });
                       }}
                       className="px-6 py-3.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors"
@@ -253,10 +296,10 @@ export default function AdmissionForm() {
                         onChange={handleChange}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] focus:border-[#D51C28] outline-hidden bg-slate-50/50"
                       >
-                        <option value="CC">C.C.</option>
-                        <option value="TI">T.I.</option>
-                        <option value="PPT">PPT (Permiso Protección)</option>
-                        <option value="CE">C.E.</option>
+                        <option value="CC">C.C. (Cédula de Ciudadanía)</option>
+                        <option value="TI">T.I. (Tarjeta de Identidad - Menor)</option>
+                        <option value="PPT">PPT (Permiso Protección Temporal)</option>
+                        <option value="CE">C.E. (Cédula de Extranjería)</option>
                       </select>
                     </div>
                     <div className="sm:col-span-2">
@@ -269,11 +312,90 @@ export default function AdmissionForm() {
                         required
                         value={formData.documento}
                         onChange={handleChange}
-                        placeholder="Número de identificación"
+                        placeholder="Número de identificación del aspirante"
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#D51C28] focus:border-[#D51C28] outline-hidden bg-slate-50/50"
                       />
                     </div>
                   </div>
+
+                  {/* DESPLIEGUE DINÁMICO: Datos del Acudiente si es menor de edad (T.I.) */}
+                  {formData.tipo_documento === 'TI' && (
+                    <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-300 text-slate-800 space-y-3 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center gap-2 text-amber-900 font-extrabold text-xs">
+                        <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Datos Obligatorios del Acudiente / Tutor Legal (Aspirante Menor de Edad)</span>
+                      </div>
+                      <p className="text-[11px] text-amber-800 leading-relaxed">
+                        Al registrarte con <strong>Tarjeta de Identidad (T.I.)</strong>, la institución requiere los datos de contacto y parentesco de tu acudiente mayor de edad para formalizar la admisión.
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Nombre Completo del Acudiente *
+                          </label>
+                          <input
+                            type="text"
+                            name="acudiente_nombre"
+                            required={formData.tipo_documento === 'TI'}
+                            value={formData.acudiente_nombre}
+                            onChange={handleChange}
+                            placeholder="Ej. María Pérez Gómez"
+                            className="w-full px-3 py-2 rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-[#D51C28] bg-white outline-hidden"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Cédula del Acudiente *
+                          </label>
+                          <input
+                            type="text"
+                            name="acudiente_documento"
+                            required={formData.tipo_documento === 'TI'}
+                            value={formData.acudiente_documento}
+                            onChange={handleChange}
+                            placeholder="Número de cédula del acudiente"
+                            className="w-full px-3 py-2 rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-[#D51C28] bg-white outline-hidden"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Celular / WhatsApp del Acudiente *
+                          </label>
+                          <input
+                            type="tel"
+                            name="acudiente_telefono"
+                            required={formData.tipo_documento === 'TI'}
+                            value={formData.acudiente_telefono}
+                            onChange={handleChange}
+                            placeholder="Ej. 300 000 0000"
+                            className="w-full px-3 py-2 rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-[#D51C28] bg-white outline-hidden"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Parentesco con el Aspirante *
+                          </label>
+                          <select
+                            name="acudiente_parentesco"
+                            value={formData.acudiente_parentesco}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-[#D51C28] bg-white outline-hidden"
+                          >
+                            <option value="Padre / Madre">Padre / Madre</option>
+                            <option value="Tutor Legal">Tutor Legal</option>
+                            <option value="Abuelo / Abuela">Abuelo / Abuela</option>
+                            <option value="Tío / Tía">Tío / Tía</option>
+                            <option value="Hermano(a) Mayor">Hermano(a) Mayor</option>
+                            <option value="Otro Representante">Otro Representante</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Celular WhatsApp y Correo */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
