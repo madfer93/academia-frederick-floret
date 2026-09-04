@@ -146,8 +146,8 @@ export default function AboutSection() {
                 </p>
                 <p>
                   ✉️ <strong>Correo Oficial:</strong><br />
-                  <a href="mailto:academiafrederickfloret@gmail.com" className="text-blue-400 hover:underline">
-                    academiafrederickfloret@gmail.com
+                  <a href="mailto:admisiones@academiafrederickfloret.com" className="text-blue-400 hover:underline">
+                    admisiones@academiafrederickfloret.com
                   </a>
                 </p>
               </div>

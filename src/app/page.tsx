@@ -81,7 +81,7 @@ export default function Home() {
                 Formación Técnica Laboral
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-                Nuestros 6 Programas Técnicos
+                Nuestros 10 Programas Técnicos Laborales
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
                 3 semestres de formación presencial con 50% de horas prácticas orientadas a las exigencias laborales de Montería.

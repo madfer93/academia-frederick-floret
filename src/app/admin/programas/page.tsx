@@ -195,6 +195,8 @@ export default function AdminProgramasPage() {
           const isUploading = uploadingId === prog.id;
           const isDragOver = dragOverId === prog.id;
 
+          const currentImg = prog.imagen_url || `/programas/${prog.slug}.webp`;
+
           return (
             <div
               key={prog.id}
@@ -275,22 +277,22 @@ export default function AdminProgramasPage() {
                     className={`relative w-full aspect-[16/11] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border-2 border-dashed flex flex-col items-center justify-center ${
                       isDragOver 
                         ? 'border-[#D51C28] bg-red-50/50 scale-[1.01]' 
-                        : prog.imagen_url 
+                        : currentImg 
                           ? 'border-slate-200 bg-slate-900 group hover:border-slate-400' 
                           : 'border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-[#D51C28]'
                     }`}
                   >
-                    {prog.imagen_url ? (
+                    {currentImg ? (
                       <>
                         <img 
-                          src={prog.imagen_url} 
+                          src={currentImg} 
                           alt={prog.titulo} 
                           className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-3 text-center">
                           <UploadCloud className="w-6 h-6 mb-1 text-white animate-bounce" />
                           <span className="font-bold text-xs">Clic para cambiar foto</span>
-                          <span className="text-[10px] text-slate-200">o arrastra una nueva imagen</span>
+                          <span className="text-[10px] text-slate-200">o arrastra una nueva imagen desde tu PC</span>
                         </div>
                       </>
                     ) : (

@@ -52,21 +52,27 @@ export async function POST(req: Request) {
       content: typeof m.content === 'string' ? m.content.slice(0, 1000).trim() : ''
     }));
 
-    const groqApiKey = process.env.GROQ_API_KEY;
-    if (!groqApiKey) {
-      return NextResponse.json(
-        { error: 'La clave de API de Groq no está configurada en las variables de entorno.' },
-        { status: 500 }
-      );
-    }
+    let groqApiKey = process.env.GROQ_API_KEY;
 
-    // 1. OBTENER INFORMACIÓN VERIFICADA EN TIEMPO REAL DESDE SUPABASE (RAG ANTI-ALUCINACIONES)
+    // Consultar configuración y textos institucionales en vivo desde Supabase
     let programasText = '';
     let configuracionText = '';
     let botName = 'FloretBot';
 
     try {
-      // Consultar programas activos
+      // 1. Obtener clave de Groq si no está en process.env
+      if (!groqApiKey) {
+        const { data: keyData } = await supabase
+          .from('sitio_configuracion')
+          .select('valor')
+          .eq('clave', 'groq_api_key')
+          .maybeSingle();
+        if (keyData?.valor) {
+          groqApiKey = keyData.valor.trim();
+        }
+      }
+
+      // 2. Consultar programas activos
       const { data: programas, error: progError } = await supabase
         .from('programas')
         .select('*')
@@ -74,7 +80,7 @@ export async function POST(req: Request) {
 
       if (!progError && programas && programas.length > 0) {
         programasText = programas.map((p, idx) => `
-${idx + 1}. ${p.titulo} (${p.categoria === 'salud' ? 'Área de la Salud' : 'Área Administrativa'})
+${idx + 1}. ${p.titulo} (${p.categoria === 'salud' ? 'Área de la Salud' : 'Área Comercial/Administrativa'})
 - Duración: ${p.duracion}
 - Modalidad: ${p.modalidad || 'Presencial (50% Teórico · 50% Práctico)'}
 - Jornadas: ${Array.isArray(p.jornadas) ? p.jornadas.join(', ') : 'Diurna, Nocturna, Sabatina'}
@@ -85,7 +91,7 @@ ${idx + 1}. ${p.titulo} (${p.categoria === 'salud' ? 'Área de la Salud' : 'Áre
 `).join('\n');
       }
 
-      // Consultar configuración y textos institucionales en vivo
+      // 3. Consultar configuración y textos institucionales
       const { data: configs, error: cfgError } = await supabase
         .from('sitio_configuracion')
         .select('clave, valor');
@@ -96,7 +102,14 @@ ${idx + 1}. ${p.titulo} (${p.categoria === 'salud' ? 'Área de la Salud' : 'Áre
         if (botNameConfig?.valor) botName = botNameConfig.valor.trim();
       }
     } catch (dbErr) {
-      console.warn('[Chat RAG Warning] No se pudo consultar Supabase para RAG, usando datos base:', dbErr);
+      console.warn('[Chat RAG Warning] Error consultando Supabase:', dbErr);
+    }
+
+    if (!groqApiKey) {
+      return NextResponse.json(
+        { error: 'La clave de API de Groq no está configurada. Por favor configúrala en el panel Admin (APIs & Integraciones).' },
+        { status: 500 }
+      );
     }
 
     // 2. CONSTRUIR SYSTEM PROMPT DINÁMICO BLINDADO

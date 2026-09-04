@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { FileEdit, Save, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { FileEdit, Save, CheckCircle2, AlertCircle, RefreshCw, Bot, ArrowRight } from 'lucide-react';
 
 interface ConfigItem {
   clave: string;
@@ -24,10 +25,14 @@ export default function AdminContenidoPage() {
       const { data, error } = await supabase
         .from('sitio_configuracion')
         .select('*')
+        .neq('categoria', 'chatbot')
         .order('categoria', { ascending: true });
 
       if (error) throw error;
-      setConfigs((data as ConfigItem[]) || []);
+      const filtered = ((data as ConfigItem[]) || []).filter(
+        c => !c.clave.startsWith('chatbot_') && !c.clave.startsWith('groq_') && !c.clave.startsWith('meta_') && !c.clave.startsWith('google_') && !c.clave.startsWith('wompi_') && !c.clave.startsWith('smtp_')
+      );
+      setConfigs(filtered);
     } catch (err) {
       console.error('Error cargando contenidos:', err);
     } finally {
@@ -99,6 +104,26 @@ export default function AdminContenidoPage() {
           <span>{errorMsg}</span>
         </div>
       )}
+
+      {/* Aviso de Configuración de Chatbot */}
+      <div className="p-4 rounded-2xl bg-slate-900 text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm border border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[#D51C28]/20 text-[#D51C28] flex items-center justify-center shrink-0 border border-[#D51C28]/30">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div>
+            <strong className="block text-slate-100 text-xs font-bold">¿Deseas personalizar FloretBot (Chatbot IA 24/7)?</strong>
+            <span className="text-[11px] text-slate-400">El nombre, bienvenida, avatar y clave de Groq se gestionan de forma centralizada en APIs &amp; Integraciones.</span>
+          </div>
+        </div>
+        <Link 
+          href="/admin/apis"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#D51C28] hover:bg-red-700 text-white font-bold text-xs shrink-0 transition-colors self-start sm:self-auto cursor-pointer"
+        >
+          <span>Ir a Configurar Chatbot</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
 
       {/* Lista de Campos Editables */}
       <div className="space-y-4">

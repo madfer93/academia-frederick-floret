@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { MapPin, Phone, Mail, Clock, Building, Monitor, ShieldCheck, MessageCircle } from 'lucide-react';
 
 import SedeGallery from '@/components/SedeGallery';
+import GoogleMapSection from '@/components/GoogleMapSection';
 
 export const metadata: Metadata = {
   title: 'Sede e Instalaciones en Montería | Edificio Frederick Floret',
@@ -28,7 +29,7 @@ const SEDE_SCHEMA = {
   "url": "https://academia-frederick-floret.vercel.app/sede",
   "image": "https://academia-frederick-floret.vercel.app/sede/fachada-edificio-frederick-floret.webp",
   "telephone": "+573205206613",
-  "email": "academiafrederickfloret@gmail.com",
+  "email": "admisiones@academiafrederickfloret.com",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Calle 27 No. 10 - 21, Barrio Centro",
@@ -212,8 +213,8 @@ export default function SedePage() {
                     <Mail className="w-4 h-4 text-[#D51C28] shrink-0 mt-1" />
                     <div>
                       <strong className="block text-slate-900">Correo Electrónico:</strong>
-                      <a href="mailto:academiafrederickfloret@gmail.com" className="text-blue-600 hover:underline">
-                        academiafrederickfloret@gmail.com
+                      <a href="mailto:admisiones@academiafrederickfloret.com" className="text-blue-600 hover:underline">
+                        admisiones@academiafrederickfloret.com
                       </a>
                     </div>
                   </div>
@@ -242,6 +243,9 @@ export default function SedePage() {
 
         </div>
       </section>
+
+      {/* Mapa Interactivo con Geolocalización Oficial */}
+      <GoogleMapSection />
 
       <Footer />
     </main>

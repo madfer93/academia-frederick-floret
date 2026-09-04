@@ -50,10 +50,10 @@ export default function AdminApisPage() {
     wompi_integrity_secret: '',
     wompi_events_secret: '',
 
-    // 4. Servidor SMTP (Correos)
-    smtp_host: 'smtp.gmail.com',
+    // 4. Servidor SMTP (Correos Titan Mail / Hostinger)
+    smtp_host: 'smtp.titan.email',
     smtp_port: '465',
-    smtp_user: 'academiafrederickfloret@gmail.com',
+    smtp_user: 'admisiones@academiafrederickfloret.com',
     smtp_pass: '',
     smtp_secure: 'ssl',
     smtp_from_name: 'Academia Frederick Floret',

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 import ChatBubble from '@/components/ChatBubble';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import './globals.css';
@@ -63,6 +64,22 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col">
         {children}
+        {/* Google tag (gtag.js) GA4 */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-TTPVHH5XKT"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics-ga4" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TTPVHH5XKT', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
+
         <WhatsAppButton />
         <ChatBubble />
         <Analytics />
