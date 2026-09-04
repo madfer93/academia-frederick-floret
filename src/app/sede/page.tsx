@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: 'Sede e Instalaciones en Montería | Edificio Frederick Floret',
   description: 'Visita nuestra sede en Calle 27 #10-21 en Montería. 353 m² en 3 plantas, sala de 80 computadores, aulas teóricas y laboratorios prácticos.',
   alternates: {
-    canonical: 'https://academia-frederick-floret.vercel.app/sede',
+    canonical: 'https://www.academiafrederickfloret.com/sede',
   },
   openGraph: {
     title: 'Sede e Instalaciones en Montería | Edificio Frederick Floret',
     description: 'Visita nuestra sede en Calle 27 #10-21 en Montería. 353 m² en 3 plantas, sala de 80 computadores, aulas teóricas y laboratorios prácticos.',
-    url: 'https://academia-frederick-floret.vercel.app/sede',
+    url: 'https://www.academiafrederickfloret.com/sede',
     type: 'website',
     locale: 'es_CO',
   },
@@ -26,8 +26,8 @@ const SEDE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
   "name": "Academia Frederick Floret - Sede Central Montería",
-  "url": "https://academia-frederick-floret.vercel.app/sede",
-  "image": "https://academia-frederick-floret.vercel.app/sede/fachada-edificio-frederick-floret.webp",
+  "url": "https://www.academiafrederickfloret.com/sede",
+  "image": "https://www.academiafrederickfloret.com/sede/fachada-edificio-frederick-floret.webp",
   "telephone": "+573205206613",
   "email": "admisiones@academiafrederickfloret.com",
   "address": {

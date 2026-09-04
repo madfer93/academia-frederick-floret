@@ -13,11 +13,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://academia-frederick-floret.vercel.app'),
+  metadataBase: new URL('https://www.academiafrederickfloret.com'),
   title: 'Academia Frederick Floret | Educación Técnica Montería',
   description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas, crédito directo y 35 años de trayectoria oficial.',
   alternates: {
-    canonical: 'https://academia-frederick-floret.vercel.app',
+    canonical: 'https://www.academiafrederickfloret.com',
   },
   verification: {
     google: 'R8F6UkNMybScXYaszR0NuWk1lbzGOo_vmIkOVuKzEa4',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     description: 'Fórmate en 3 semestres en Enfermería, Salud Oral, Farmacia y Administración en Montería. Prácticas clínicas y 35 años de experiencia.',
     type: 'website',
     locale: 'es_CO',
-    url: 'https://academia-frederick-floret.vercel.app',
+    url: 'https://www.academiafrederickfloret.com',
     siteName: 'Academia Frederick Floret'
   }
 };

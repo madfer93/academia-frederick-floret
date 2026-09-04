@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   title: 'Programas Técnicos Laborales en Montería | Frederick Floret',
   description: 'Estudia Enfermería, Salud Oral, Farmacia, Administrativo en Salud y Gestión en Montería. Formación práctica de 3 semestres y créditos directos.',
   alternates: {
-    canonical: 'https://academia-frederick-floret.vercel.app/programas',
+    canonical: 'https://www.academiafrederickfloret.com/programas',
   },
   openGraph: {
     title: 'Programas Técnicos Laborales en Montería | Frederick Floret',
     description: 'Estudia Enfermería, Salud Oral, Farmacia, Administrativo en Salud y Gestión en Montería. Formación práctica de 3 semestres y créditos directos.',
-    url: 'https://academia-frederick-floret.vercel.app/programas',
+    url: 'https://www.academiafrederickfloret.com/programas',
     type: 'website',
     locale: 'es_CO',
   },
@@ -37,7 +37,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -50,7 +50,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -63,7 +63,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -76,7 +76,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -89,7 +89,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -102,7 +102,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -115,7 +115,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     },
     {
@@ -129,7 +129,7 @@ const PROGRAMS_SCHEMA = {
       "provider": {
         "@type": "EducationalOrganization",
         "name": "Academia Frederick Floret",
-        "url": "https://academia-frederick-floret.vercel.app"
+        "url": "https://www.academiafrederickfloret.com"
       }
     }
   ]

@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Inscripciones y Admisiones 2026 | Academia Frederick Floret',
   description: 'Inscríbete online a carreras técnicas laborales en Montería. Facilidades de pago en 4 cuotas sin bancos ni intereses y crédito educativo directo.',
   alternates: {
-    canonical: 'https://academia-frederick-floret.vercel.app/inscripciones',
+    canonical: 'https://www.academiafrederickfloret.com/inscripciones',
   },
   openGraph: {
     title: 'Inscripciones y Admisiones 2026 | Academia Frederick Floret',
     description: 'Inscríbete online a carreras técnicas laborales en Montería. Facilidades de pago en 4 cuotas sin bancos ni intereses y crédito educativo directo.',
-    url: 'https://academia-frederick-floret.vercel.app/inscripciones',
+    url: 'https://www.academiafrederickfloret.com/inscripciones',
     type: 'website',
     locale: 'es_CO',
   },
@@ -26,7 +26,7 @@ const INSCRIPCIONES_SCHEMA = {
     {
       "@type": "ContactPage",
       "name": "Admisiones e Inscripciones Academia Frederick Floret",
-      "url": "https://academia-frederick-floret.vercel.app/inscripciones",
+      "url": "https://www.academiafrederickfloret.com/inscripciones",
       "description": "Formulario de reserva de cupo y preinscripción para programas técnicos laborales en Montería."
     },
     {

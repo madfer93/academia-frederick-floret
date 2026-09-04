@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   title: 'Nuestra Institución | 35 Años de Trayectoria en Montería',
   description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
   alternates: {
-    canonical: 'https://academia-frederick-floret.vercel.app/nosotros',
+    canonical: 'https://www.academiafrederickfloret.com/nosotros',
   },
   openGraph: {
     title: 'Nuestra Institución | 35 Años de Trayectoria en Montería',
     description: 'Conoce la historia, misión, modelo pedagógico y marco normativo de la Academia Frederick Floret en Montería, fundada el 18 de noviembre de 1991.',
-    url: 'https://academia-frederick-floret.vercel.app/nosotros',
+    url: 'https://www.academiafrederickfloret.com/nosotros',
     type: 'website',
     locale: 'es_CO',
   },
@@ -25,7 +25,7 @@ const NOSOTROS_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   "name": "Acerca de la Academia Frederick Floret",
-  "url": "https://academia-frederick-floret.vercel.app/nosotros",
+  "url": "https://www.academiafrederickfloret.com/nosotros",
   "mainEntity": {
     "@type": "EducationalOrganization",
     "name": "Academia Frederick Floret S.A.S.",
