@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     canonical: 'https://www.academiafrederickfloret.com',
   },
   verification: {
-    google: 'R8F6UkNMybScXYaszR0NuWk1lbzGOo_vmIkOVuKzEa4',
+    google: ['YjYNHz6dTLfH6TnGpCmLzNJyuJoKVA_o1ouaV2Rr44o', 'R8F6UkNMybScXYaszR0NuWk1lbzGOo_vmIkOVuKzEa4'],
   },
   keywords: [
     'Academia Frederick Floret',
