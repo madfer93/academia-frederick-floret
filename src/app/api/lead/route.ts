@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { syncLeadToQ10 } from '@/lib/q10';
 import { sendTelegramAlert, formatLeadAlert } from '@/lib/telegram';
+import { verifyRecaptchaToken } from '@/lib/recaptcha';
 
 // In-memory rate limiter (máximo 10 registros por 5 minutos por IP)
 const leadRateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -38,6 +39,17 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    // Verificación reCAPTCHA v3 si viene presente
+    if (body.recaptcha_token) {
+      const recaptchaResult = await verifyRecaptchaToken(body.recaptcha_token);
+      if (!recaptchaResult.success) {
+        return NextResponse.json(
+          { error: 'Validación de seguridad reCAPTCHA no superada. Intenta nuevamente.' },
+          { status: 403 }
+        );
+      }
+    }
 
     const nombres = (body.nombres || 'Aspirante').trim().slice(0, 100);
     const apellidos = (body.apellidos || '').trim().slice(0, 100);

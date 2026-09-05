@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 import ChatBubble from '@/components/ChatBubble';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import PageTelemetryTracker from '@/components/PageTelemetryTracker';
 import './globals.css';
 
 const inter = Inter({
@@ -82,7 +83,14 @@ export default function RootLayout({
 
         <WhatsAppButton />
         <ChatBubble />
+        <PageTelemetryTracker />
         <Analytics />
+
+        {/* Google reCAPTCHA v3 */}
+        <Script
+          src="https://www.google.com/recaptcha/api.js?render=6LcZIKotAAAAAOhDeHVgOQSsZwaD1-B4ilCN7D8u"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   Lock,
-  KeyRound
+  KeyRound,
+  BarChart3
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -86,6 +87,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const NAV_ITEMS = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Inscripciones (Leads)', href: '/admin/inscripciones', icon: Users },
+    { label: 'Métricas & Tráfico', href: '/admin/metricas', icon: BarChart3 },
     { label: 'Programas Técnicos', href: '/admin/programas', icon: GraduationCap },
     { label: 'Contenidos Web', href: '/admin/contenido', icon: FileEdit },
     { label: 'Galería de Fotos', href: '/admin/galeria', icon: ImageIcon },
