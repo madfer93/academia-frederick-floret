@@ -62,6 +62,11 @@ export default function AdminApisPage() {
     groq_api_key: '',
     jym_engine_url: 'https://engine.jymtechsolutions.online',
     q10_api_key: '',
+    q10_subdominio: 'afrederickf',
+    q10_url_portal: 'https://afrederickf.q10.com',
+    q10_url_preinscripcion: 'https://afrederickf.q10.com/Preinscripcion',
+    q10_url_solicitudes: 'https://afrederickf.q10.com/SolicitudesInstitucionales/NuevaSolicitud',
+    facebook_url: 'https://www.facebook.com/academiafrederickfloret',
     telegram_bot_token: '',
     telegram_chat_id: '',
 
@@ -292,9 +297,65 @@ export default function AdminApisPage() {
                 </p>
               </div>
 
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Subdominio Institucional Q10
+                </label>
+                <input
+                  type="text"
+                  name="q10_subdominio"
+                  value={formData.q10_subdominio}
+                  onChange={handleChange}
+                  placeholder="afrederickf"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Enlace Portal Estudiantes Q10
+                </label>
+                <input
+                  type="text"
+                  name="q10_url_portal"
+                  value={formData.q10_url_portal}
+                  onChange={handleChange}
+                  placeholder="https://afrederickf.q10.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Enlace Preinscripción en Línea Q10
+                </label>
+                <input
+                  type="text"
+                  name="q10_url_preinscripcion"
+                  value={formData.q10_url_preinscripcion}
+                  onChange={handleChange}
+                  placeholder="https://afrederickf.q10.com/Preinscripcion"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Enlace Solicitudes / PQRS Q10
+                </label>
+                <input
+                  type="text"
+                  name="q10_url_solicitudes"
+                  value={formData.q10_url_solicitudes}
+                  onChange={handleChange}
+                  placeholder="https://afrederickf.q10.com/SolicitudesInstitucionales/NuevaSolicitud"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
+                />
+              </div>
+
               <div className="sm:col-span-2 space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Q10 REST API Token (Admisiones &amp; Estudiantes)
+                  Q10 REST API Token (Admisiones &amp; Estudiantes - Opcional)
                 </label>
                 <input
                   type="text"
@@ -305,7 +366,7 @@ export default function AdminApisPage() {
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50/50"
                 />
                 <p className="text-[11px] text-slate-400">
-                  Permite crear automáticamente al aspirante en la plataforma Q10 en cuanto envía el formulario en la web.
+                  Permite crear automáticamente al aspirante en la plataforma Q10 en cuanto envía el formulario en la web (cuando Q10 active el módulo de API).
                 </p>
               </div>
 

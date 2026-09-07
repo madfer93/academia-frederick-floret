@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Phone, GraduationCap, ArrowRight, ShieldCheck } from 'lucide-react';
+import { getSitioConfig, DEFAULT_SITIO_CONFIG, SitioConfig } from '@/lib/sitioConfig';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [config, setConfig] = useState<SitioConfig>(DEFAULT_SITIO_CONFIG);
+
+  useEffect(() => {
+    getSitioConfig().then(setConfig);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
@@ -23,12 +29,12 @@ export default function Navbar() {
             <span className="font-semibold text-amber-400">✨ 35 Años Educando a Córdoba</span>
             <span className="hidden sm:inline text-slate-600">|</span>
             <a 
-              href="https://wa.me/573205206613?text=Hola,%20deseo%20informaci%C3%B3n%20sobre%20las%20inscripciones%20en%20Academia%20Frederick%20Floret" 
+              href={`https://wa.me/${config.whatsapp_numero}?text=Hola,%20deseo%20informaci%C3%B3n%20sobre%20las%20inscripciones%20en%20Academia%20Frederick%20Floret`} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-white flex items-center gap-1 transition-colors"
             >
-              <Phone className="w-3 h-3 text-red-500" /> (+57) 320 520 6613
+              <Phone className="w-3 h-3 text-red-500" /> {config.telefono_sede}
             </a>
           </div>
         </div>
@@ -77,7 +83,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           {/* Acceso a Q10 */}
           <a
-            href="https://q10academico.com"
+            href={config.q10_url_portal}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:border-[#D51C28] hover:text-[#D51C28] transition-all bg-slate-50/50"
@@ -149,7 +155,7 @@ export default function Navbar() {
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
             <a
-              href="https://q10academico.com"
+              href={config.q10_url_portal}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm bg-slate-50"

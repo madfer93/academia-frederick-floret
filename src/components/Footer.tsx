@@ -1,9 +1,17 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Phone, Mail, MapPin, GraduationCap, ShieldCheck } from 'lucide-react';
+import { getSitioConfig, DEFAULT_SITIO_CONFIG, SitioConfig } from '@/lib/sitioConfig';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [config, setConfig] = useState<SitioConfig>(DEFAULT_SITIO_CONFIG);
+
+  useEffect(() => {
+    getSitioConfig().then(setConfig);
+  }, []);
 
   return (
     <footer className="bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
@@ -142,7 +150,7 @@ export default function Footer() {
             <ul className="space-y-2 text-slate-400">
               <li>
                 <a
-                  href="https://q10academico.com"
+                  href={config.q10_url_portal}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors flex items-center gap-1.5 text-amber-400 font-semibold"
@@ -188,18 +196,18 @@ export default function Footer() {
             <div className="space-y-2.5 text-slate-400">
               <p className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <span>Calle 27 No. 10 - 21, Barrio Centro, Montería, Córdoba.</span>
+                <span>{config.direccion_sede}</span>
               </p>
               <p className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-red-500 shrink-0" />
-                <a href="https://wa.me/573205206613" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                  (+57) 320 520 6613
+                <a href={`https://wa.me/${config.whatsapp_numero}`} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                  {config.telefono_sede}
                 </a>
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-red-500 shrink-0" />
-                <a href="mailto:admisiones@academiafrederickfloret.com" className="hover:text-white">
-                  admisiones@academiafrederickfloret.com
+                <a href={`mailto:${config.email_contacto}`} className="hover:text-white">
+                  {config.email_contacto}
                 </a>
               </p>
               <div className="pt-2">
