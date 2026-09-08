@@ -86,7 +86,7 @@ export default function AdminFinanzasPage() {
   const [descuentos, setDescuentos] = useState<DescuentoQ10[]>([]);
   const [estudiantesQ10, setEstudiantesQ10] = useState<EstudianteQ10[]>([]);
   const [leadsWeb, setLeadsWeb] = useState<LeadWeb[]>([]);
-  const [activeTab, setActiveTab] = useState<'matriculados' | 'sin_matricula' | 'leads'>('matriculados');
+  const [activeTab, setActiveTab] = useState<'matriculados' | 'empleados' | 'sin_matricula' | 'leads'>('matriculados');
   
   // Filtros
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos');
@@ -223,13 +223,17 @@ export default function AdminFinanzasPage() {
   const mesActual = new Date().getMonth() + 1;
   const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-  // Separación clara de grupos
+  // Separación clara de 3 categorías en Q10
   const matriculadosOficiales = useMemo(() => {
     return estudiantesQ10.filter(e => (e as any).categoria === 'matriculado_oficial');
   }, [estudiantesQ10]);
 
-  const personasSinMatricula = useMemo(() => {
-    return estudiantesQ10.filter(e => (e as any).categoria !== 'matriculado_oficial');
+  const empleadosDocentes = useMemo(() => {
+    return estudiantesQ10.filter(e => (e as any).categoria === 'empleado_docente');
+  }, [estudiantesQ10]);
+
+  const aspirantesSinMatricula = useMemo(() => {
+    return estudiantesQ10.filter(e => (e as any).categoria === 'sin_matricula');
   }, [estudiantesQ10]);
 
   // Resumen Métricas
@@ -248,8 +252,10 @@ export default function AdminFinanzasPage() {
   // Filtrado de la lista activa
   const listToFilter = activeTab === 'matriculados' 
     ? matriculadosOficiales 
+    : activeTab === 'empleados'
+    ? empleadosDocentes
     : activeTab === 'sin_matricula' 
-    ? personasSinMatricula 
+    ? aspirantesSinMatricula 
     : [];
 
   const filteredItems = useMemo(() => {
@@ -431,7 +437,7 @@ export default function AdminFinanzasPage() {
 
       </div>
 
-      {/* Selector de Pestañas: Matriculados Q10 vs Registrados sin Matrícula vs Leads */}
+      {/* Selector de Pestañas: Matriculados vs Empleados vs Aspirantes vs Leads */}
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('matriculados')}
@@ -446,6 +452,18 @@ export default function AdminFinanzasPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab('empleados')}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+            activeTab === 'empleados'
+              ? 'bg-slate-900 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-200/60'
+          }`}
+        >
+          <Award className="w-4 h-4 text-purple-400" />
+          <span>👥 Docentes &amp; Funcionarios ({empleadosDocentes.length})</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('sin_matricula')}
           className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'sin_matricula'
@@ -454,7 +472,7 @@ export default function AdminFinanzasPage() {
           }`}
         >
           <Users className="w-4 h-4 text-blue-400" />
-          <span>📋 Registrados Q10 (Sin Matrícula / Contactos) ({personasSinMatricula.length})</span>
+          <span>📋 Aspirantes Q10 (Sin Matrícula) ({aspirantesSinMatricula.length})</span>
         </button>
 
         <button
@@ -466,7 +484,7 @@ export default function AdminFinanzasPage() {
           }`}
         >
           <Users className="w-4 h-4 text-amber-400" />
-          <span>🌐 Prospectos Web / Leads ({leadsWeb.length})</span>
+          <span>🌐 Prospectos Web / CRM ({leadsWeb.length})</span>
         </button>
       </div>
 
@@ -480,8 +498,10 @@ export default function AdminFinanzasPage() {
               <h3 className="text-base font-black text-slate-900">
                 {activeTab === 'matriculados'
                   ? 'Listado Oficial de Estudiantes Matriculados (Q10 Académico)'
+                  : activeTab === 'empleados'
+                  ? 'Planta de Docentes, Asesores de Tesorería & Funcionarios (Q10)'
                   : activeTab === 'sin_matricula'
-                  ? 'Personas y Contactos Registrados en Q10 (Pendientes de Legalizar Matrícula)'
+                  ? 'Aspirantes y Contactos Registrados en Q10 (Pendientes de Legalizar Matrícula)'
                   : 'Prospectos Captados desde el Formulario Web y Chatbot IA'}
               </h3>
               <p className="text-xs text-slate-500">
@@ -600,43 +620,42 @@ export default function AdminFinanzasPage() {
           )}
         </div>
 
-        {/* TABLA PRINCIPAL */}
+        {/* TABLA PRINCIPAL SEGÚN PESTAÑA */}
         <div className="overflow-x-auto">
-          {activeTab !== 'leads' ? (
+          {activeTab === 'matriculados' && (
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-4 px-6">Estudiante / Identificación</th>
-                  <th className="py-4 px-6">{activeTab === 'matriculados' ? 'Programa Académico' : 'Estado en Q10'}</th>
+                  <th className="py-4 px-6">Programa Académico</th>
                   <th className="py-4 px-6">Sede &amp; Jornada</th>
                   <th className="py-4 px-6 text-center">Periodo</th>
                   <th className="py-4 px-6">Estado Matrícula / Cartera</th>
                   <th className="py-4 px-6">Tarifa / Inversión</th>
-                  <th className="py-4 px-6 text-right">Acciones &amp; Mensajes</th>
+                  <th className="py-4 px-6 text-right">Acciones &amp; Recibos</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {estudiantesPaginados.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-slate-400">
-                      No se encontraron registros con los filtros seleccionados.
+                      No se encontraron estudiantes matriculados con los filtros seleccionados.
                     </td>
                   </tr>
                 ) : (
                   estudiantesPaginados.map((est) => {
                     const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
                     const esCumpleMes = est.mes_cumpleanos === mesActual;
-                    const esMatriculado = (est as any).categoria === 'matriculado_oficial';
 
                     return (
-                      <tr key={est.Consecutivo_inscripcion} className="hover:bg-slate-50/90 transition-colors">
+                      <tr key={est.Consecutivo_inscripcion || est.Numero_identificacion} className="hover:bg-slate-50/90 transition-colors">
                         <td className="py-4 px-6">
                           <div className="font-bold text-slate-900 capitalize text-xs">
-                            {est.Nombre_completo.toLowerCase()}
+                            {est.Nombre_completo?.toLowerCase()}
                           </div>
                           <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
                             <span>CC: {est.Numero_identificacion || est.Codigo_estudiante}</span>
-                            {esCumpleMes && esMatriculado && (
+                            {esCumpleMes && (
                               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[9px] font-extrabold" title={`Cumpleaños: Día ${est.dia_cumpleanos}`}>
                                 <Cake className="w-2.5 h-2.5" /> Cumpleañero
                               </span>
@@ -645,42 +664,32 @@ export default function AdminFinanzasPage() {
                         </td>
                         <td className="py-4 px-6">
                           <div className="font-semibold text-slate-800 leading-snug">{est.Nombre_programa}</div>
-                          {esMatriculado && (
-                            <div className="text-[10px] text-slate-400 font-bold uppercase">{est.Codigo_programa}</div>
-                          )}
+                          <div className="text-[10px] text-slate-400 font-bold uppercase">{est.Codigo_programa}</div>
                         </td>
                         <td className="py-4 px-6">
                           <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium whitespace-nowrap">
-                            {est.Nombre_sede_jornada || est.Nombre_jornada || 'Pendiente'}
+                            {est.Nombre_sede_jornada || est.Nombre_jornada || 'Montería Diurna'}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-lg font-black text-xs border whitespace-nowrap ${
-                            esMatriculado ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-slate-100 text-slate-600 border-slate-200'
-                          }`}>
-                            {est.Periodo_nombre || est.per_nombre || 'Pendiente'}
+                          <span className="inline-block px-3 py-1 rounded-lg font-black text-xs border whitespace-nowrap bg-blue-50 text-blue-800 border-blue-200">
+                            {est.Periodo_nombre || est.per_nombre || '2026-2'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                          {esMatriculado ? (
-                            est.estado_financiero === 'al_dia' ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Al Día
-                              </span>
-                            ) : (
-                              <div>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200 whitespace-nowrap">
-                                  <AlertCircle className="w-3 h-3 text-red-600" /> Saldo Pendiente
-                                </span>
-                                <div className="text-[10px] text-red-600 font-bold mt-0.5">
-                                  Debe: {formatCOP(est.saldo_pendiente || 450000)}
-                                </div>
-                              </div>
-                            )
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
-                              <Clock className="w-3 h-3 text-amber-600" /> Sin Matrícula Q10
+                          {est.estado_financiero === 'al_dia' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Al Día
                             </span>
+                          ) : (
+                            <div>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200 whitespace-nowrap">
+                                <AlertCircle className="w-3 h-3 text-red-600" /> Saldo Pendiente
+                              </span>
+                              <div className="text-[10px] text-red-600 font-bold mt-0.5">
+                                Debe: {formatCOP(est.saldo_pendiente || 450000)}
+                              </div>
+                            </div>
                           )}
                         </td>
                         <td className="py-4 px-6 font-black text-slate-900 text-xs whitespace-nowrap">
@@ -706,13 +715,11 @@ export default function AdminFinanzasPage() {
                               <span>Recibo PDF</span>
                             </button>
 
-                            {/* Botón de Enviar Mensaje / Plantilla */}
+                            {/* Botón Mensaje */}
                             <button
                               onClick={() => {
                                 setModalEstudiante(est);
-                                if (!esMatriculado) {
-                                  setTipoMensaje('bienvenida');
-                                } else if (est.estado_financiero === 'deudor') {
+                                if (est.estado_financiero === 'deudor') {
                                   setTipoMensaje('cobro');
                                 } else if (esCumpleMes) {
                                   setTipoMensaje('cumpleanos');
@@ -729,7 +736,7 @@ export default function AdminFinanzasPage() {
 
                             {/* Botón WhatsApp */}
                             <a
-                              href={`https://wa.me/573205206613?text=Hola%20${encodeURIComponent(est.Nombre_completo)},%20te%20saludamos%20de%20la%20Academia%20Frederick%20Floret.`}
+                              href={`https://wa.me/573205206613?text=Hola%20${encodeURIComponent(est.Nombre_completo || '')},%20te%20saludamos%20de%20la%20Academia%20Frederick%20Floret.`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
@@ -745,7 +752,169 @@ export default function AdminFinanzasPage() {
                 )}
               </tbody>
             </table>
-          ) : (
+          )}
+
+          {activeTab === 'empleados' && (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-4 px-6">Funcionario / Docente &amp; Documento</th>
+                  <th className="py-4 px-6">Cargo &amp; Función en Q10</th>
+                  <th className="py-4 px-6">Área / Dependencia Institucional</th>
+                  <th className="py-4 px-6">Email / Usuario Q10</th>
+                  <th className="py-4 px-6">Teléfono / Contacto</th>
+                  <th className="py-4 px-6 text-center">Estado Q10</th>
+                  <th className="py-4 px-6 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {estudiantesPaginados.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center py-12 text-slate-400">
+                      No se encontraron docentes o funcionarios registrados en Q10.
+                    </td>
+                  </tr>
+                ) : (
+                  estudiantesPaginados.map((emp) => {
+                    const cargo = (emp as any).cargo_funcion || 'Personal Institucional';
+                    const area = (emp as any).area_dependencia || 'Planta Docente';
+                    const isDocente = cargo.toLowerCase().includes('docente') || cargo.toLowerCase().includes('instructor');
+                    const isSuperAdmin = cargo.toLowerCase().includes('superadministrador');
+                    const isCajero = cargo.toLowerCase().includes('cajer') || cargo.toLowerCase().includes('tesorer');
+
+                    return (
+                      <tr key={emp.Consecutivo_inscripcion || emp.Numero_identificacion} className="hover:bg-slate-50/90 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="font-bold text-slate-900 capitalize text-xs">
+                            {emp.Nombre_completo?.toLowerCase()}
+                          </div>
+                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                            CC / ID: {emp.Numero_identificacion || emp.Codigo_estudiante || 'Configurado en Q10'}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold border ${
+                            isDocente
+                              ? 'bg-purple-50 text-purple-800 border-purple-200'
+                              : isSuperAdmin
+                              ? 'bg-red-50 text-red-800 border-red-200'
+                              : isCajero
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-blue-50 text-blue-800 border-blue-200'
+                          }`}>
+                            {isDocente && '🎓'}
+                            {isSuperAdmin && '⚡'}
+                            {isCajero && '💵'}
+                            {!isDocente && !isSuperAdmin && !isCajero && '💼'}
+                            <span>{cargo}</span>
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="font-semibold text-slate-800 text-xs">{area}</div>
+                          <div className="text-[10px] text-slate-400 font-bold">Sede Principal Montería</div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="font-mono text-slate-700 text-[11px]">
+                            {emp.email || 'Acceso por cédula en Q10'}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="text-slate-700 font-medium text-[11px]">
+                            {emp.telefono || '320 520 6613'}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Activo en Q10
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <a
+                              href={`https://wa.me/57${(emp.telefono || '3205206613').replace(/\D/g, '')}?text=Hola%20${encodeURIComponent(emp.Nombre_completo || '')},%20comunicado%20institucional%20de%20la%20Academia%20Frederick%20Floret.`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors"
+                              title="Contactar vía WhatsApp"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>WhatsApp</span>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          )}
+
+          {activeTab === 'sin_matricula' && (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-4 px-6">Aspirante / Contacto Registrado</th>
+                  <th className="py-4 px-6">Estado en Q10 Académico</th>
+                  <th className="py-4 px-6">Usuario / Email de Acceso</th>
+                  <th className="py-4 px-6">Teléfono</th>
+                  <th className="py-4 px-6 text-right">Gestión de Prematrícula</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {estudiantesPaginados.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-12 text-slate-400">
+                      No hay aspirantes sin matrícula en este momento.
+                    </td>
+                  </tr>
+                ) : (
+                  estudiantesPaginados.map((asp) => (
+                    <tr key={asp.Consecutivo_inscripcion || asp.Numero_identificacion} className="hover:bg-slate-50/90 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="font-bold text-slate-900 capitalize text-xs">
+                          {asp.Nombre_completo?.toLowerCase()}
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                          CC: {asp.Numero_identificacion || asp.Codigo_estudiante}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
+                          <Clock className="w-3 h-3 text-amber-600" /> Registrado en Q10 · Sin Matrícula
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-mono text-slate-700 text-[11px]">
+                          {asp.email || `${asp.Numero_identificacion}@aspirante.floret.edu.co`}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="text-slate-700 font-medium text-[11px]">
+                          {asp.telefono || '320 520 6613'}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <a
+                            href={`https://wa.me/573205206613?text=Hola%20${encodeURIComponent(asp.Nombre_completo || '')},%20te%20escribimos%20de%20la%20Academia%20Frederick%20Floret%20para%20formalizar%20tu%20matr%C3%ADcula%20acad%C3%A9mica.`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>Contactar para Matrícula</span>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+
+          {activeTab === 'leads' && (
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
                 <tr>

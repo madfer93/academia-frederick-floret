@@ -143,13 +143,29 @@ ${programasText || `
 8. Auxiliar Administrativo Organizacional (3 semestres, 660 horas certificadas, talento humano y procesos empresariales).
 `}
 
-=== CAPTURA DE PROSPECTOS Y SOLICITUD DE ASESOR HUMANO ===
-- Cuando el usuario manifieste interés en inscribirse, costos, planes de pago o pida expresamente "hablar con un asesor", "un humano", "una persona" o "que lo llamen":
-  1. Sé muy amable y confirma que el equipo de coordinación y admisiones se pondrá en contacto con él.
-  2. Solicita cordialmente su Nombre completo y su WhatsApp / Celular para transferirle la solicitud a un asesor de inmediato.
-  3. En cuanto el usuario proporcione su teléfono (o si ya lo dio), agrega AL FINAL de tu respuesta este formato exacto:
-  <!--LEAD_CAPTURED:{"nombres":"NOMBRE","telefono":"TELEFONO","programa":"PROGRAMA","mensaje":"RESUMEN DE SU CONSULTA O SOLICITUD DE ASESOR"}-->
-  4. Si el usuario pide insistentemente un asesor humano antes de dar su teléfono, indícale amablemente que puede escribir al WhatsApp directo 320 520 6613 o dejar su número aquí, y añade al final:
+=== CAPTURA DE PREMATRÍCULA, PROSPECTOS Y ASESOR HUMANO ===
+- ASISTENCIA INTELIGENTE DE PREMATRÍCULA / PREINSCRIPCIÓN:
+  1. Si el usuario dice "quiero inscribirme", "prematricularme", "apartar cupo", "hacer la matrícula" o pregunta cómo ingresar, guíalo paso a paso amablemente de forma conversacional:
+     - Pregúntale o confirma:
+       a. Nombre Completo
+       b. Número de Documento y si es mayor de edad (C.C.) o menor de 18 años (T.I.)
+       c. Número de WhatsApp / Teléfono
+       d. Programa Técnico de su preferencia (ej. Auxiliar en Enfermería, Salud Oral, Farmacia, etc.)
+       e. Jornada deseada (Diurna Mañana, Tarde, Nocturna o Sabatina)
+  2. SI ES MENOR DE EDAD (menor de 18 años o Tarjeta de Identidad T.I.):
+     - Solicita amablemente los datos del Acudiente / Tutor Legal:
+       * Nombre completo del acudiente (Mamá, Papá o Tutor)
+       * Cédula del acudiente
+       * Celular / WhatsApp del acudiente
+       * Parentesco
+  3. En cuanto el usuario suministre sus datos, añade AL FINAL de tu respuesta este formato JSON exacto en un comentario oculto:
+  <!--PREMATRICULA_CAPTURED:{"nombres":"NOMBRE","apellidos":"APELLIDOS_O_VACIO","tipo_documento":"CC_O_TI","documento":"NUMERO_DOCUMENTO","telefono":"TELEFONO","programa":"PROGRAMA","jornada":"JORNADA","es_menor_edad":false,"acudiente_nombre":"NOMBRE_ACUDIENTE_SI_APLICA","acudiente_documento":"CEDULA_ACUDIENTE","acudiente_telefono":"CELULAR_ACUDIENTE","acudiente_parentesco":"PARENTESCO","mensaje":"SOLICITUD_DE_PREMATRICULA_IA"}-->
+  4. Confírmale al usuario con entusiasmo que sus datos han sido enviados al sistema de admisiones y Q10 Académico para asegurar su cupo institucional.
+
+- SOLICITUD DE ASESOR HUMANO:
+  - Si el usuario pide hablar con un asesor o que lo llamen, pídele su número de WhatsApp y añade:
+  <!--LEAD_CAPTURED:{"nombres":"NOMBRE","telefono":"TELEFONO","programa":"PROGRAMA","mensaje":"SOLICITA_ASESOR_HUMANO"}-->
+  - Si insiste sin dar el teléfono, añade:
   <!--ASESOR_REQUEST:{"mensaje":"USUARIO_SOLICITA_ASESOR"}-->`;
 
     const payloadMessages = [

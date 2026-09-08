@@ -177,6 +177,37 @@ export default function ChatBubble() {
       const data = await response.json();
       let replyContent = data.reply || 'Disculpa, no pude procesar tu consulta en este momento. Por favor contáctanos al WhatsApp 320 520 6613.';
 
+      // Detectar si la IA capturó una prematricula completa para sincronizar con Q10 y CRM
+      const prematriculaMatch = replyContent.match(/<!--PREMATRICULA_CAPTURED:(.*?)-->/);
+      if (prematriculaMatch && prematriculaMatch[1]) {
+        try {
+          const pData = JSON.parse(prematriculaMatch[1]);
+          fetch('/api/lead', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nombres: pData.nombres || 'Aspirante',
+              apellidos: pData.apellidos || '',
+              tipo_documento: pData.tipo_documento || (pData.es_menor_edad ? 'TI' : 'CC'),
+              documento: pData.documento || 'PENDIENTE',
+              telefono: pData.telefono,
+              programa_interes: pData.programa || 'Auxiliar en Enfermería',
+              jornada_interes: pData.jornada || 'Diurna (Mañana)',
+              mensaje: pData.mensaje || 'Prematrícula registrada a través del Asistente Virtual IA 24/7',
+              origen: `Chat IA 24/7 (Prematrícula Inteligente)`,
+              acudiente_nombre: pData.acudiente_nombre || undefined,
+              acudiente_documento: pData.acudiente_documento || undefined,
+              acudiente_telefono: pData.acudiente_telefono || undefined,
+              acudiente_parentesco: pData.acudiente_parentesco || undefined,
+            })
+          }).catch((e) => console.warn('[Prematricula Dispatch Error]:', e));
+          setLeadRegistered(true);
+        } catch (e) {
+          console.warn('Error parseando prematricula:', e);
+        }
+        replyContent = replyContent.replace(/<!--PREMATRICULA_CAPTURED:(.*?)-->/, '').trim();
+      }
+
       // Detectar si la IA capturó un lead para enviarlo al CRM, Telegram y Q10
       const leadMatch = replyContent.match(/<!--LEAD_CAPTURED:(.*?)-->/);
       if (leadMatch && leadMatch[1]) {
@@ -236,6 +267,7 @@ export default function ChatBubble() {
   };
 
   const QUICK_QUESTIONS = [
+    '📝 Quiero prematricularme y apartar mi cupo',
     '¿Cuáles son los programas técnicos disponibles?',
     '¿Cómo funciona el pago en 4 cuotas?',
     '¿Qué requisitos exigen?',

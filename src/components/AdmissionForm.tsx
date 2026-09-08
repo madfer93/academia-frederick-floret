@@ -65,50 +65,7 @@ export default function AdmissionForm() {
         notasMensaje = notasMensaje ? `${notasMensaje}\n\n${acudienteInfo}` : acudienteInfo;
       }
 
-      const basePayload: Record<string, unknown> = {
-        nombres: formData.nombres.trim(),
-        apellidos: formData.apellidos.trim(),
-        tipo_documento: formData.tipo_documento,
-        documento: formData.documento.trim(),
-        telefono: formData.telefono.trim(),
-        email: formData.email.trim() || null,
-        programa_interes: formData.programa_interes,
-        jornada_interes: formData.jornada_interes,
-        nivel_educativo: formData.nivel_educativo,
-        mensaje: notasMensaje || null
-      };
-
-      let insertError = null;
-
-      // Intentar insertar con columnas dedicadas si es TI
-      if (formData.tipo_documento === 'TI') {
-        const fullPayload = {
-          ...basePayload,
-          acudiente_nombre: formData.acudiente_nombre.trim(),
-          acudiente_documento: formData.acudiente_documento.trim(),
-          acudiente_telefono: formData.acudiente_telefono.trim(),
-          acudiente_parentesco: formData.acudiente_parentesco
-        };
-        const res = await supabase.from('inscripciones').insert([fullPayload]);
-        insertError = res.error;
-      } else {
-        const res = await supabase.from('inscripciones').insert([basePayload]);
-        insertError = res.error;
-      }
-
-      // Si falla por columna no existente en schema cache, reintentar con basePayload seguro
-      if (insertError && formData.tipo_documento === 'TI') {
-        const retryRes = await supabase.from('inscripciones').insert([basePayload]);
-        insertError = retryRes.error;
-      }
-
-      if (insertError) {
-        console.error('Error insertando en Supabase:', insertError);
-        throw new Error('No se pudo guardar la inscripción. Por favor inténtalo de nuevo o contáctanos por WhatsApp.');
-      }
-
-      // Notificar de inmediato al grupo de Telegram directivo y CRM
-      fetch('/api/lead', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -121,14 +78,19 @@ export default function AdmissionForm() {
           programa_interes: formData.programa_interes,
           jornada_interes: formData.jornada_interes,
           nivel_educativo: formData.nivel_educativo,
-          mensaje: formData.mensaje.trim() || null,
-          origen: 'Formulario Web Oficial',
+          mensaje: notasMensaje || 'Preinscripción / Prematrícula desde formulario web oficial',
+          origen: 'Formulario Web Oficial (Prematrícula)',
           acudiente_nombre: formData.tipo_documento === 'TI' ? formData.acudiente_nombre.trim() : undefined,
           acudiente_documento: formData.tipo_documento === 'TI' ? formData.acudiente_documento.trim() : undefined,
           acudiente_telefono: formData.tipo_documento === 'TI' ? formData.acudiente_telefono.trim() : undefined,
           acudiente_parentesco: formData.tipo_documento === 'TI' ? formData.acudiente_parentesco : undefined,
         })
-      }).catch((e) => console.warn('[Telegram Lead Notify Error]:', e));
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'No se pudo registrar la preinscripción. Intenta nuevamente.');
+      }
 
       setSuccess(true);
     } catch (err: unknown) {

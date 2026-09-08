@@ -1,23 +1,62 @@
+import { supabase } from '@/lib/supabase';
+
 /**
  * Utilidad oficial para alertas inmediatas a Telegram
  * Academia Frederick Floret
  */
 
-export async function sendTelegramAlert(message: string): Promise<boolean> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+let cachedTelegramConfig: { token: string; chatId: string; timestamp: number } | null = null;
 
-  if (!token || !chatId) {
-    console.warn('[Telegram Alert] No se configuró TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID en las variables de entorno.');
+async function getTelegramCredentials(): Promise<{ token: string; chatId: string } | null> {
+  let token = process.env.TELEGRAM_BOT_TOKEN;
+  let chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (token && chatId) {
+    return { token, chatId };
+  }
+
+  if (cachedTelegramConfig && Date.now() - cachedTelegramConfig.timestamp < 5 * 60 * 1000) {
+    return { token: cachedTelegramConfig.token, chatId: cachedTelegramConfig.chatId };
+  }
+
+  try {
+    const { data } = await supabase
+      .from('sitio_configuracion')
+      .select('clave, valor')
+      .in('clave', ['telegram_bot_token', 'telegram_chat_id']);
+
+    if (data && data.length > 0) {
+      data.forEach((item) => {
+        if (item.clave === 'telegram_bot_token' && item.valor) token = item.valor.trim();
+        if (item.clave === 'telegram_chat_id' && item.valor) chatId = item.valor.trim();
+      });
+    }
+
+    if (token && chatId) {
+      cachedTelegramConfig = { token, chatId, timestamp: Date.now() };
+      return { token, chatId };
+    }
+  } catch (e) {
+    console.warn('[Telegram Config Lookup Warning]:', e);
+  }
+
+  return token && chatId ? { token, chatId } : null;
+}
+
+export async function sendTelegramAlert(message: string): Promise<boolean> {
+  const creds = await getTelegramCredentials();
+
+  if (!creds || !creds.token || !creds.chatId) {
+    console.warn('[Telegram Alert] No se configuró token o chat_id de Telegram en .env o sitio_configuracion.');
     return false;
   }
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const response = await fetch(`https://api.telegram.org/bot${creds.token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: chatId,
+        chat_id: creds.chatId,
         text: message,
         parse_mode: 'Markdown',
         disable_web_page_preview: true,
@@ -59,28 +98,33 @@ export function formatLeadAlert(lead: {
     ? `${lead.tipo_documento || 'CC'} ${lead.documento}` 
     : 'No especificado';
 
-  let text = `🚨 *¡NUEVO PROSPECTO REGISTRADO!* 🚨\n\n`;
+  const esMenor = lead.tipo_documento === 'TI' || Boolean(lead.acudiente_nombre);
+
+  let text = esMenor 
+    ? `🚨 *¡NUEVA PREMATRÍCULA (ASPIRANTE MENOR DE EDAD)!* 🚨\n\n`
+    : `🚨 *¡NUEVA PREMATRÍCULA / PROSPECTO CAPTURADO!* 🚨\n\n`;
+
   text += `👤 *Aspirante:* ${fullName}\n`;
-  text += `📄 *Documento:* ${docInfo}\n`;
+  text += `📄 *Documento:* ${docInfo} ${esMenor ? '_(Menor de Edad)_' : ''}\n`;
   text += `📱 *WhatsApp / Tel:* [${lead.telefono}](https://wa.me/57${cleanPhone})\n`;
   if (lead.email) {
     text += `✉️ *Correo:* ${lead.email}\n`;
   }
-  text += `🎓 *Programa de Interés:* ${lead.programa_interes}\n`;
+  text += `🎓 *Programa:* ${lead.programa_interes}\n`;
   if (lead.jornada_interes) {
     text += `☀️ *Jornada:* ${lead.jornada_interes}\n`;
   }
   if (lead.nivel_educativo) {
-    text += `📚 *Nivel Educativo:* ${lead.nivel_educativo}\n`;
+    text += `📚 *Nivel:* ${lead.nivel_educativo}\n`;
   }
-  text += `📍 *Canal / Origen:* ${lead.origen || 'Formulario Web'}\n`;
+  text += `📍 *Canal / Origen:* ${lead.origen || 'Formulario Web Oficial'}\n`;
 
   // Datos del acudiente si aplica
-  if (lead.acudiente_nombre || lead.tipo_documento === 'TI') {
-    text += `\n🛡️ *DATOS DEL ACUDIENTE (T.I. - Menor de edad):*\n`;
-    text += `• *Nombre:* ${lead.acudiente_nombre || 'No registrado'}\n`;
+  if (esMenor) {
+    text += `\n🛡️ *DATOS OBLIGATORIOS DEL ACUDIENTE / TUTOR LEGAL:*\n`;
+    text += `• *Nombre Acudiente:* ${lead.acudiente_nombre || 'Pendiente por confirmar'}\n`;
     if (lead.acudiente_documento) {
-      text += `• *Cédula:* ${lead.acudiente_documento}\n`;
+      text += `• *Cédula Acudiente:* ${lead.acudiente_documento}\n`;
     }
     if (lead.acudiente_telefono) {
       const cleanAcudientePhone = lead.acudiente_telefono.replace(/\D/g, '');

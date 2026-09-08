@@ -97,6 +97,8 @@ export async function POST(req: Request) {
     const q10Result = await syncLeadToQ10({
       nombres,
       apellidos,
+      tipo_documento: body.tipo_documento || 'CC',
+      documento: body.documento && body.documento !== 'PENDIENTE' ? body.documento : undefined,
       telefono,
       email: email || undefined,
       programa_interes,
