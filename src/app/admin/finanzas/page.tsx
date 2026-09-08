@@ -29,7 +29,10 @@ import {
   X,
   FileText,
   UserCheck,
-  UserX
+  UserX,
+  Printer,
+  Download,
+  Share2
 } from 'lucide-react';
 
 interface DescuentoQ10 {
@@ -99,6 +102,17 @@ export default function AdminFinanzasPage() {
   const [modalEstudiante, setModalEstudiante] = useState<EstudianteQ10 | null>(null);
   const [tipoMensaje, setTipoMensaje] = useState<'motivacional' | 'cumpleanos' | 'cobro' | 'bienvenida'>('motivacional');
   const [copiado, setCopiado] = useState(false);
+
+  // Modal de Recibo Oficial de Pago / Estado de Cuenta PDF
+  const [modalRecibo, setModalRecibo] = useState<EstudianteQ10 | null>(null);
+  const [reciboNum, setReciboNum] = useState<string>('');
+  const [reciboConcepto, setReciboConcepto] = useState<string>('');
+  const [reciboValor, setReciboValor] = useState<number>(0);
+  const [reciboAbono, setReciboAbono] = useState<number>(0);
+  const [reciboCajero, setReciboCajero] = useState<string>('Tesorería / Cartera');
+  const [reciboMedioPago, setReciboMedioPago] = useState<string>('Efectivo');
+  const [reciboObservaciones, setReciboObservaciones] = useState<string>('Abono a programa académico');
+  const [reciboFecha, setReciboFecha] = useState<string>('');
 
   // Wompi
   const [wompiMode, setWompiMode] = useState<string>('test');
@@ -674,6 +688,24 @@ export default function AdminFinanzasPage() {
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-1.5">
+                            {/* Botón Generar Recibo PDF */}
+                            <button
+                              onClick={() => {
+                                setModalRecibo(est);
+                                setReciboNum(String(est.Consecutivo_inscripcion || ''));
+                                setReciboConcepto(`${est.Nombre_programa || 'Programa Técnico'} · ${est.Periodo_nombre || '2026-2'}`);
+                                const t = TARIFAS_PROGRAMAS[est.Codigo_programa] || 0;
+                                setReciboValor(t);
+                                setReciboAbono(0);
+                                setReciboFecha(new Date().toLocaleDateString('es-CO'));
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-xs whitespace-nowrap"
+                              title="Generar e imprimir Recibo Oficial de Pago (PDF)"
+                            >
+                              <Printer className="w-3.5 h-3.5 text-emerald-200" />
+                              <span>Recibo PDF</span>
+                            </button>
+
                             {/* Botón de Enviar Mensaje / Plantilla */}
                             <button
                               onClick={() => {
@@ -688,7 +720,7 @@ export default function AdminFinanzasPage() {
                                   setTipoMensaje('motivacional');
                                 }
                               }}
-                              className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-xs whitespace-nowrap"
                               title="Enviar correo o mensaje predeterminado"
                             >
                               <Mail className="w-3.5 h-3.5 text-amber-400" />
@@ -1001,6 +1033,261 @@ export default function AdminFinanzasPage() {
                 </div>
               );
             })()}
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE GENERACIÓN DE RECIBO OFICIAL DE PAGO (PDF / IMPRESIÓN) */}
+      {modalRecibo && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-3xl w-full p-4 sm:p-8 shadow-2xl border border-slate-200 space-y-6 max-h-[95vh] overflow-y-auto">
+            
+            {/* Controles de Configuración del Recibo (Solo pantalla) */}
+            <div className="print:hidden flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+                  Recibo Oficial de Tesorería
+                </span>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 mt-1">
+                  Generador de Recibo de Pago · Recibo Nº {reciboNum}
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+                >
+                  <Printer className="w-4 h-4 text-emerald-400" />
+                  <span>Imprimir / PDF</span>
+                </button>
+
+                <button
+                  onClick={() => setModalRecibo(null)}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Configuración Rápida de Valores (Solo pantalla) */}
+            <div className="print:hidden bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">Nº Recibo:</label>
+                <input
+                  type="text"
+                  value={reciboNum}
+                  onChange={(e) => setReciboNum(e.target.value)}
+                  className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">Cajero(a) / Emisor:</label>
+                <input
+                  type="text"
+                  value={reciboCajero}
+                  onChange={(e) => setReciboCajero(e.target.value)}
+                  className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">Medio de Pago:</label>
+                <select
+                  value={reciboMedioPago}
+                  onChange={(e) => setReciboMedioPago(e.target.value)}
+                  className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900"
+                >
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                  <option value="Wompi / PSE / Nequi">Wompi / PSE / Nequi</option>
+                  <option value="Tarjeta Débito/Crédito">Tarjeta Débito/Crédito</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">Concepto Principal:</label>
+                <input
+                  type="text"
+                  value={reciboConcepto}
+                  onChange={(e) => setReciboConcepto(e.target.value)}
+                  className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">Monto de este Pago ($):</label>
+                <input
+                  type="number"
+                  value={reciboAbono}
+                  onChange={(e) => setReciboAbono(Number(e.target.value))}
+                  className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg font-bold text-emerald-700"
+                />
+              </div>
+            </div>
+
+            {/* FORMATO OFICIAL IMPRIMIBLE DEL RECIBO (Exacto al Recibo 648 de Frederick Floret) */}
+            <div id="recibo-imprimible" className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-300 text-slate-900 space-y-5 font-sans">
+              
+              {/* Encabezado Oficial */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
+                <div className="flex items-center gap-3">
+                  <img src="/logo.png" alt="Logo Frederick Floret" className="h-14 w-auto object-contain" />
+                  <div>
+                    <h2 className="font-black text-base uppercase tracking-tight text-slate-900">
+                      RECIBO DE PAGO
+                    </h2>
+                    <p className="font-bold text-sm text-slate-800">Academia Frederick Floret</p>
+                    <p className="text-[10px] text-slate-600">
+                      NIT: 901261489-5 / Cl. 27 #10-21, Montería, Córdoba / Teléfono: 3205206613
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-100 border border-slate-300 px-5 py-2.5 rounded-xl text-center shrink-0">
+                  <div className="text-xs font-black text-slate-900 uppercase">Recibo Nº {reciboNum}</div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">- COPIA / ORIGINAL -</div>
+                </div>
+              </div>
+
+              {/* Ficha de Datos del Estudiante */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs border-b pb-4 bg-slate-50/60 p-3 rounded-xl">
+                <div>
+                  <span className="font-bold text-slate-500">Fecha:</span>{' '}
+                  <span className="font-semibold text-slate-900">{reciboFecha}</span>
+                </div>
+                <div>
+                  <span className="font-bold text-slate-500">Cajero(a):</span>{' '}
+                  <span className="font-bold text-slate-900">{reciboCajero}</span>
+                </div>
+                <div>
+                  <span className="font-bold text-slate-500">Recibido de:</span>{' '}
+                  <span className="font-black text-slate-900 uppercase">{modalRecibo.Nombre_completo}</span>
+                </div>
+                <div>
+                  <span className="font-bold text-slate-500">Identificación:</span>{' '}
+                  <span className="font-mono font-bold text-slate-900">{modalRecibo.Numero_identificacion || modalRecibo.Codigo_estudiante}</span>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="font-bold text-slate-500">Programa / Periodo:</span>{' '}
+                  <span className="font-semibold text-slate-900">{modalRecibo.Nombre_programa} · {modalRecibo.Periodo_nombre || '2026-2'}</span>
+                </div>
+              </div>
+
+              {/* Tabla de Conceptos y Abono */}
+              <div className="border border-slate-300 rounded-lg overflow-hidden text-xs">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300 text-[11px]">
+                    <tr>
+                      <th className="p-2.5 border-r border-slate-300">Conceptos</th>
+                      <th className="p-2.5 text-right border-r border-slate-300">Valor unidad</th>
+                      <th className="p-2.5 text-right border-r border-slate-300">Descuento</th>
+                      <th className="p-2.5 text-right border-r border-slate-300">Pagado</th>
+                      <th className="p-2.5 text-right bg-emerald-50 text-emerald-900 font-black">Este pago</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    <tr>
+                      <td className="p-2.5 font-bold uppercase border-r border-slate-200">{reciboConcepto}</td>
+                      <td className="p-2.5 text-right font-semibold border-r border-slate-200">{formatCOP(reciboValor)}</td>
+                      <td className="p-2.5 text-right text-slate-500 border-r border-slate-200">$ 0</td>
+                      <td className="p-2.5 text-right text-slate-500 border-r border-slate-200">$ 0</td>
+                      <td className="p-2.5 text-right font-black text-emerald-700 bg-emerald-50/50">{formatCOP(reciboAbono)}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot className="bg-slate-100 font-black text-xs border-t border-slate-300">
+                    <tr>
+                      <td colSpan={4} className="p-2.5 text-right uppercase">TOTAL PAGADO ({reciboMedioPago}):</td>
+                      <td className="p-2.5 text-right text-emerald-800 text-sm bg-emerald-100">{formatCOP(reciboAbono)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Pagos Pendientes / Estado de Cartera */}
+              <div className="space-y-1">
+                <span className="text-[11px] font-black uppercase text-slate-700 tracking-wider">
+                  Pagos Pendientes &amp; Saldo de Cartera
+                </span>
+                <div className="border border-slate-300 rounded-lg overflow-hidden text-xs">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 text-[10px] uppercase">
+                      <tr>
+                        <th className="p-2 border-r border-slate-300">Descripción</th>
+                        <th className="p-2 text-right border-r border-slate-300">Valor</th>
+                        <th className="p-2 text-right border-r border-slate-300">Abonado</th>
+                        <th className="p-2 text-right bg-red-50 text-red-900 font-black">Pendiente</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 text-[11px]">
+                      <tr>
+                        <td className="p-2 font-medium border-r border-slate-200">{reciboConcepto}</td>
+                        <td className="p-2 text-right font-semibold border-r border-slate-200">{formatCOP(reciboValor)}</td>
+                        <td className="p-2 text-right text-emerald-700 border-r border-slate-200">{formatCOP(reciboAbono)}</td>
+                        <td className="p-2 text-right font-black text-red-700 bg-red-50/50">{formatCOP(Math.max(0, reciboValor - reciboAbono))}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Observaciones y Firma */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-200 text-xs">
+                <div>
+                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-1">Observaciones:</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 font-medium">
+                    {reciboObservaciones}
+                  </div>
+                </div>
+
+                <div className="space-y-6 text-center">
+                  <div className="pt-6 border-b border-slate-400 w-3/4 mx-auto"></div>
+                  <div className="text-[11px]">
+                    <span className="font-black block uppercase text-slate-900">{reciboCajero}</span>
+                    <span className="text-slate-500 block text-[10px]">Tesorería / Cartera · Academia Frederick Floret</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center text-[10px] text-slate-400 pt-2">
+                Fecha de impresión: {new Date().toLocaleDateString('es-CO')} · Academia Frederick Floret Montería
+              </div>
+            </div>
+
+            {/* Botones de Acción del Modal */}
+            <div className="print:hidden flex flex-wrap items-center justify-between gap-3 pt-2">
+              <a
+                href={`https://wa.me/573205206613?text=${encodeURIComponent(`*ACADEMIA FREDERICK FLORET*\n*RECIBO DE PAGO Nº ${reciboNum}*\n\nEstimado(a) ${modalRecibo.Nombre_completo},\nSe ha registrado tu pago por valor de *${formatCOP(reciboAbono)}* correspondiente a *${reciboConcepto}*.\n\nSaldo pendiente: *${formatCOP(Math.max(0, reciboValor - reciboAbono))}*\nMedio de pago: ${reciboMedioPago}\n\n¡Gracias por tu confianza!`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Enviar Comprobante por WhatsApp</span>
+              </a>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModalRecibo(null)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Cerrar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+                >
+                  <Printer className="w-4 h-4 text-emerald-400" />
+                  <span>Imprimir / Guardar PDF</span>
+                </button>
+              </div>
+            </div>
 
           </div>
         </div>
