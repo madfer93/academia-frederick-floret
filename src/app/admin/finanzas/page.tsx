@@ -32,7 +32,8 @@ import {
   UserX,
   Printer,
   Download,
-  Share2
+  Share2,
+  Bot
 } from 'lucide-react';
 
 interface DescuentoQ10 {
@@ -75,6 +76,7 @@ interface LeadWeb {
   apellidos: string;
   telefono: string;
   email?: string;
+  documento?: string;
   programa_interes: string;
   jornada_interes: string;
   estado: string;
@@ -86,7 +88,7 @@ export default function AdminFinanzasPage() {
   const [descuentos, setDescuentos] = useState<DescuentoQ10[]>([]);
   const [estudiantesQ10, setEstudiantesQ10] = useState<EstudianteQ10[]>([]);
   const [leadsWeb, setLeadsWeb] = useState<LeadWeb[]>([]);
-  const [activeTab, setActiveTab] = useState<'matriculados' | 'empleados' | 'sin_matricula' | 'leads'>('matriculados');
+  const [activeTab, setActiveTab] = useState<'inscritos' | 'matriculados' | 'empleados' | 'leads'>('inscritos');
   
   // Filtros
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos');
@@ -141,46 +143,51 @@ export default function AdminFinanzasPage() {
     'SIN_PROGRAMA': 0
   };
 
+  const handleUpdateStudentStatus = async (documento: string, nuevoEstado: string, id?: string, nombre?: string, programa?: string) => {
+    try {
+      const res = await fetch('/api/admin/actualizar-estado-estudiante', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          documento,
+          id,
+          estado: nuevoEstado,
+          nombres: nombre,
+          programa
+        })
+      });
+
+      if (res.ok) {
+        setEstudiantesQ10(prev => prev.map(est => {
+          if (est.Numero_identificacion === documento || (id && (est as any).id === id)) {
+            const isMatriculado = nuevoEstado === 'matriculado';
+            return {
+              ...est,
+              estado_crm: nuevoEstado,
+              categoria: isMatriculado ? 'matriculado_oficial' : (est as any).categoria === 'empleado_docente' ? 'empleado_docente' : 'inscrito_q10',
+              estado_matricula: isMatriculado ? 'Matriculado Oficial' : nuevoEstado === 'contactado' ? 'Contactado (En Proceso)' : nuevoEstado === 'descartado' ? 'No Interesado' : 'Inscrito (Pendiente)',
+              estado_financiero: isMatriculado ? 'al_dia' : 'en_proceso'
+            };
+          }
+          return est;
+        }));
+
+        setLeadsWeb(prev => prev.map(lead => {
+          if (lead.documento === documento || lead.id === id) {
+            return { ...lead, estado: nuevoEstado };
+          }
+          return lead;
+        }));
+      }
+    } catch (e) {
+      console.error('Error actualizando estado:', e);
+    }
+  };
+
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      // 1. Obtener datos reales de Q10 API
-      const q10Res = await fetch('/api/admin/q10-inscripciones');
-      if (q10Res.ok) {
-        const q10Json = await q10Res.json();
-        if (q10Json.inscripciones) {
-          // Enriquecer datos con estados financieros y cumpleaños
-          const mesActual = new Date().getMonth() + 1;
-          const enriched: EstudianteQ10[] = q10Json.inscripciones.map((item: any, idx: number) => {
-            const tarifa = TARIFAS_PROGRAMAS[item.Codigo_programa] || TARIFAS_PROGRAMAS[item.Nombre_programa] || 1250000;
-            // Distribución realista de estados de cartera
-            const isDeudor = item.categoria === 'matriculado_oficial' && idx % 3 === 0;
-            const saldo = isDeudor ? Math.round(tarifa * 0.4) : 0;
-            const estado_financiero: 'al_dia' | 'deudor' | 'en_proceso' = isDeudor ? 'deudor' : 'al_dia';
-            
-            // Asignar mes de cumpleaños distribuido
-            const mes_cumple = (idx % 12) + 1;
-            const dia_cumple = (idx % 28) + 1;
-
-            return {
-              ...item,
-              estado_financiero,
-              saldo_pendiente: saldo,
-              mes_cumpleanos: mes_cumple,
-              dia_cumpleanos: dia_cumple,
-              email: item.email || `${item.Codigo_estudiante}@estudiantes.floret.edu.co`,
-              telefono: item.telefono || `3205206613`
-            };
-          });
-
-          setEstudiantesQ10(enriched);
-        }
-        if (q10Json.descuentos) {
-          setDescuentos(q10Json.descuentos);
-        }
-      }
-
-      // 2. Obtener configuración Wompi y Leads de Supabase
+      // 1. Obtener configuración Wompi y Leads de Supabase (CRM)
       const { data: configData } = await supabase
         .from('sitio_configuracion')
         .select('clave, valor')
@@ -198,8 +205,79 @@ export default function AdminFinanzasPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
+      const crmMap = new Map<string, any>();
       if (leadsData) {
         setLeadsWeb(leadsData as LeadWeb[]);
+        leadsData.forEach((l: any) => {
+          if (l.documento && l.documento !== 'PENDIENTE') {
+            crmMap.set(l.documento, l);
+          }
+        });
+      }
+
+      // 2. Obtener datos reales de Q10 API
+      const q10Res = await fetch('/api/admin/q10-inscripciones');
+      if (q10Res.ok) {
+        const q10Json = await q10Res.json();
+        if (q10Json.inscripciones) {
+          const mesActual = new Date().getMonth() + 1;
+          const enriched: EstudianteQ10[] = q10Json.inscripciones.map((item: any, idx: number) => {
+            const tarifa = TARIFAS_PROGRAMAS[item.Codigo_programa] || TARIFAS_PROGRAMAS[item.Nombre_programa] || 1250000;
+            const crmMatch = crmMap.get(item.Numero_identificacion);
+            const crmEstado = crmMatch?.estado;
+
+            const esEmpleado = item.categoria === 'empleado_docente';
+            const esMatriculadoConfirmado = crmEstado === 'matriculado';
+            const esContactado = crmEstado === 'contactado';
+            const esNoInteresado = crmEstado === 'descartado';
+
+            let categoria = item.categoria;
+            let estadoMatricula = 'Inscrito (Pendiente de Matrícula)';
+            let estadoFinanciero: 'al_dia' | 'deudor' | 'en_proceso' = 'en_proceso';
+
+            if (esEmpleado) {
+              categoria = 'empleado_docente';
+              estadoMatricula = item.cargo_funcion || 'Personal Institucional';
+            } else if (esMatriculadoConfirmado) {
+              categoria = 'matriculado_oficial';
+              estadoMatricula = 'Matriculado Oficial';
+              estadoFinanciero = 'al_dia';
+            } else if (esContactado) {
+              categoria = 'inscrito_q10';
+              estadoMatricula = 'Contactado (En Proceso)';
+              estadoFinanciero = 'en_proceso';
+            } else if (esNoInteresado) {
+              categoria = 'inscrito_q10';
+              estadoMatricula = 'No Interesado';
+              estadoFinanciero = 'en_proceso';
+            } else {
+              categoria = 'inscrito_q10';
+              estadoMatricula = 'Inscrito (Pendiente de Matrícula)';
+              estadoFinanciero = 'en_proceso';
+            }
+
+            const mes_cumple = (idx % 12) + 1;
+            const dia_cumple = (idx % 28) + 1;
+
+            return {
+              ...item,
+              categoria,
+              estado_crm: crmEstado || 'pendiente',
+              estado_matricula: estadoMatricula,
+              estado_financiero: estadoFinanciero,
+              saldo_pendiente: esMatriculadoConfirmado ? 0 : 0,
+              mes_cumpleanos: mes_cumple,
+              dia_cumpleanos: dia_cumple,
+              email: item.email || `${item.Codigo_estudiante || item.Numero_identificacion}@aspirante.floret.edu.co`,
+              telefono: item.telefono || `3205206613`
+            };
+          });
+
+          setEstudiantesQ10(enriched);
+        }
+        if (q10Json.descuentos) {
+          setDescuentos(q10Json.descuentos);
+        }
       }
     } catch (err) {
       console.error('Error cargando datos:', err);
@@ -223,17 +301,17 @@ export default function AdminFinanzasPage() {
   const mesActual = new Date().getMonth() + 1;
   const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-  // Separación clara de 3 categorías en Q10
+  // Separación clara de 4 categorías
+  const inscritosQ10 = useMemo(() => {
+    return estudiantesQ10.filter(e => (e as any).categoria === 'inscrito_q10');
+  }, [estudiantesQ10]);
+
   const matriculadosOficiales = useMemo(() => {
     return estudiantesQ10.filter(e => (e as any).categoria === 'matriculado_oficial');
   }, [estudiantesQ10]);
 
   const empleadosDocentes = useMemo(() => {
     return estudiantesQ10.filter(e => (e as any).categoria === 'empleado_docente');
-  }, [estudiantesQ10]);
-
-  const aspirantesSinMatricula = useMemo(() => {
-    return estudiantesQ10.filter(e => (e as any).categoria === 'sin_matricula');
   }, [estudiantesQ10]);
 
   // Resumen Métricas
@@ -254,12 +332,12 @@ export default function AdminFinanzasPage() {
     ? matriculadosOficiales 
     : activeTab === 'empleados'
     ? empleadosDocentes
-    : activeTab === 'sin_matricula' 
-    ? aspirantesSinMatricula 
+    : activeTab === 'inscritos' 
+    ? inscritosQ10 
     : [];
 
   const filteredItems = useMemo(() => {
-    return listToFilter.filter(est => {
+    return listToFilter.filter((est: EstudianteQ10) => {
       const matchPeriodo = filtroPeriodo === 'todos' || est.Periodo_nombre === filtroPeriodo || est.per_nombre === filtroPeriodo;
       const matchProg = filtroPrograma === 'todos' || est.Nombre_programa.toLowerCase().includes(filtroPrograma.toLowerCase()) || est.Codigo_programa.toLowerCase().includes(filtroPrograma.toLowerCase());
       
@@ -437,8 +515,20 @@ export default function AdminFinanzasPage() {
 
       </div>
 
-      {/* Selector de Pestañas: Matriculados vs Empleados vs Aspirantes vs Leads */}
+      {/* Selector de Pestañas: Inscritos vs Matriculados vs Empleados vs Leads */}
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('inscritos')}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+            activeTab === 'inscritos'
+              ? 'bg-slate-900 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-200/60'
+          }`}
+        >
+          <Users className="w-4 h-4 text-amber-400" />
+          <span>📋 Inscripciones Q10 (Pendientes Matrícula) ({inscritosQ10.length})</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('matriculados')}
           className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
@@ -448,7 +538,7 @@ export default function AdminFinanzasPage() {
           }`}
         >
           <GraduationCap className="w-4 h-4 text-emerald-400" />
-          <span>🎓 Matriculados Oficiales Q10 ({matriculadosOficiales.length})</span>
+          <span>🎓 Matriculados Oficiales ({matriculadosOficiales.length})</span>
         </button>
 
         <button
@@ -464,18 +554,6 @@ export default function AdminFinanzasPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('sin_matricula')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-            activeTab === 'sin_matricula'
-              ? 'bg-slate-900 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-200/60'
-          }`}
-        >
-          <Users className="w-4 h-4 text-blue-400" />
-          <span>📋 Aspirantes Q10 (Sin Matrícula) ({aspirantesSinMatricula.length})</span>
-        </button>
-
-        <button
           onClick={() => setActiveTab('leads')}
           className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'leads'
@@ -483,8 +561,8 @@ export default function AdminFinanzasPage() {
               : 'text-slate-600 hover:bg-slate-200/60'
           }`}
         >
-          <Users className="w-4 h-4 text-amber-400" />
-          <span>🌐 Prospectos Web / CRM ({leadsWeb.length})</span>
+          <Bot className="w-4 h-4 text-blue-400" />
+          <span>🌐 Prospectos Web / Chat IA ({leadsWeb.length})</span>
         </button>
       </div>
 
@@ -496,12 +574,12 @@ export default function AdminFinanzasPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-black text-slate-900">
-                {activeTab === 'matriculados'
-                  ? 'Listado Oficial de Estudiantes Matriculados (Q10 Académico)'
+                {activeTab === 'inscritos'
+                  ? 'Aspirantes con Inscripción Registrada en Q10 (Pendientes de Formalizar Matrícula)'
+                  : activeTab === 'matriculados'
+                  ? 'Estudiantes con Matrícula Académica Formalizada'
                   : activeTab === 'empleados'
                   ? 'Planta de Docentes, Asesores de Tesorería & Funcionarios (Q10)'
-                  : activeTab === 'sin_matricula'
-                  ? 'Aspirantes y Contactos Registrados en Q10 (Pendientes de Legalizar Matrícula)'
                   : 'Prospectos Captados desde el Formulario Web y Chatbot IA'}
               </h3>
               <p className="text-xs text-slate-500">
@@ -622,6 +700,157 @@ export default function AdminFinanzasPage() {
 
         {/* TABLA PRINCIPAL SEGÚN PESTAÑA */}
         <div className="overflow-x-auto">
+          {activeTab === 'inscritos' && (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-4 px-6">Aspirante Inscrito &amp; Cédula</th>
+                  <th className="py-4 px-6">Programa de Inscripción Q10</th>
+                  <th className="py-4 px-6">Sede &amp; Jornada</th>
+                  <th className="py-4 px-6 text-center">Periodo</th>
+                  <th className="py-4 px-6">Estado Actual</th>
+                  <th className="py-4 px-6">Cambiar Estado (CRM)</th>
+                  <th className="py-4 px-6 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {estudiantesPaginados.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center py-12 text-slate-400">
+                      No se encontraron inscripciones con los filtros seleccionados.
+                    </td>
+                  </tr>
+                ) : (
+                  estudiantesPaginados.map((est: EstudianteQ10) => {
+                    const crmEstado = (est as any).estado_crm || 'pendiente';
+                    const isContactado = crmEstado === 'contactado';
+                    const isMatriculado = crmEstado === 'matriculado';
+                    const isDescartado = crmEstado === 'descartado';
+
+                    return (
+                      <tr key={est.Consecutivo_inscripcion || est.Numero_identificacion} className="hover:bg-slate-50/90 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="font-bold text-slate-900 capitalize text-xs">
+                            {est.Nombre_completo?.toLowerCase()}
+                          </div>
+                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                            CC: {est.Numero_identificacion || est.Codigo_estudiante}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="font-semibold text-slate-800 leading-snug">{est.Nombre_programa}</div>
+                          <div className="text-[10px] text-slate-400 font-bold uppercase">{est.Codigo_programa}</div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium whitespace-nowrap">
+                            {est.Nombre_sede_jornada || est.Nombre_jornada || 'Montería'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <span className="inline-block px-3 py-1 rounded-lg font-black text-xs border whitespace-nowrap bg-amber-50 text-amber-800 border-amber-200">
+                            {est.Periodo_nombre || est.per_nombre || '2026-1'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {isMatriculado ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Matriculado Oficial
+                            </span>
+                          ) : isContactado ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
+                              <UserCheck className="w-3 h-3 text-blue-600" /> Contactado
+                            </span>
+                          ) : isDescartado ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200 whitespace-nowrap">
+                              <UserX className="w-3 h-3 text-red-600" /> No Interesado
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
+                              <Clock className="w-3 h-3 text-amber-600" /> Inscrito (Pendiente Matrícula)
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <button
+                              onClick={() => handleUpdateStudentStatus(est.Numero_identificacion, 'contactado', (est as any).id, est.Nombre_completo, est.Nombre_programa)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                                isContactado ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-white text-blue-700 border-blue-200 hover:bg-blue-50'
+                              }`}
+                              title="Marcar como contactado"
+                            >
+                              📞 Contactado
+                            </button>
+                            <button
+                              onClick={() => handleUpdateStudentStatus(est.Numero_identificacion, 'matriculado', (est as any).id, est.Nombre_completo, est.Nombre_programa)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                                isMatriculado ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50'
+                              }`}
+                              title="Formalizar matrícula oficial"
+                            >
+                              🎓 Matriculado
+                            </button>
+                            <button
+                              onClick={() => handleUpdateStudentStatus(est.Numero_identificacion, 'descartado', (est as any).id, est.Nombre_completo, est.Nombre_programa)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                                isDescartado ? 'bg-red-600 text-white border-red-600 shadow-xs' : 'bg-white text-red-700 border-red-200 hover:bg-red-50'
+                              }`}
+                              title="Marcar como no interesado"
+                            >
+                              ❌ No Interesado
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => {
+                                setModalRecibo(est);
+                                setReciboNum(String(est.Consecutivo_inscripcion || ''));
+                                setReciboConcepto(`Inscripción / Matrícula: ${est.Nombre_programa || 'Programa Técnico'} · ${est.Periodo_nombre || '2026-1'}`);
+                                const t = TARIFAS_PROGRAMAS[est.Codigo_programa] || 0;
+                                setReciboValor(t);
+                                setReciboAbono(0);
+                                setReciboFecha(new Date().toLocaleDateString('es-CO'));
+                              }}
+                              className="px-2 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[10px] flex items-center gap-1 transition-all cursor-pointer shadow-xs whitespace-nowrap"
+                              title="Recibo Oficial de Pago"
+                            >
+                              <Printer className="w-3 h-3 text-emerald-200" />
+                              <span>Recibo</span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setModalEstudiante(est);
+                                setTipoMensaje('bienvenida');
+                              }}
+                              className="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] flex items-center gap-1 transition-all cursor-pointer shadow-xs whitespace-nowrap"
+                              title="Mensaje"
+                            >
+                              <Mail className="w-3 h-3 text-amber-400" />
+                              <span>Mensaje</span>
+                            </button>
+
+                            <a
+                              href={`https://wa.me/573205206613?text=Hola%20${encodeURIComponent(est.Nombre_completo || '')},%20te%20saludamos%20de%20la%20Academia%20Frederick%20Floret%20respecto%20a%20tu%20inscripci%C3%B3n%20en%20${encodeURIComponent(est.Nombre_programa || '')}.`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                              title="WhatsApp"
+                            >
+                              <MessageSquare className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          )}
+
           {activeTab === 'matriculados' && (
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
@@ -643,7 +872,7 @@ export default function AdminFinanzasPage() {
                     </td>
                   </tr>
                 ) : (
-                  estudiantesPaginados.map((est) => {
+                  estudiantesPaginados.map((est: EstudianteQ10) => {
                     const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
                     const esCumpleMes = est.mes_cumpleanos === mesActual;
 
@@ -775,7 +1004,7 @@ export default function AdminFinanzasPage() {
                     </td>
                   </tr>
                 ) : (
-                  estudiantesPaginados.map((emp) => {
+                  estudiantesPaginados.map((emp: EstudianteQ10) => {
                     const cargo = (emp as any).cargo_funcion || 'Personal Institucional';
                     const area = (emp as any).area_dependencia || 'Planta Docente';
                     const isDocente = cargo.toLowerCase().includes('docente') || cargo.toLowerCase().includes('instructor');
@@ -845,70 +1074,6 @@ export default function AdminFinanzasPage() {
                       </tr>
                     );
                   })
-                )}
-              </tbody>
-            </table>
-          )}
-
-          {activeTab === 'sin_matricula' && (
-            <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
-                <tr>
-                  <th className="py-4 px-6">Aspirante / Contacto Registrado</th>
-                  <th className="py-4 px-6">Estado en Q10 Académico</th>
-                  <th className="py-4 px-6">Usuario / Email de Acceso</th>
-                  <th className="py-4 px-6">Teléfono</th>
-                  <th className="py-4 px-6 text-right">Gestión de Prematrícula</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                {estudiantesPaginados.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="text-center py-12 text-slate-400">
-                      No hay aspirantes sin matrícula en este momento.
-                    </td>
-                  </tr>
-                ) : (
-                  estudiantesPaginados.map((asp) => (
-                    <tr key={asp.Consecutivo_inscripcion || asp.Numero_identificacion} className="hover:bg-slate-50/90 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="font-bold text-slate-900 capitalize text-xs">
-                          {asp.Nombre_completo?.toLowerCase()}
-                        </div>
-                        <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                          CC: {asp.Numero_identificacion || asp.Codigo_estudiante}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
-                          <Clock className="w-3 h-3 text-amber-600" /> Registrado en Q10 · Sin Matrícula
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="font-mono text-slate-700 text-[11px]">
-                          {asp.email || `${asp.Numero_identificacion}@aspirante.floret.edu.co`}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="text-slate-700 font-medium text-[11px]">
-                          {asp.telefono || '320 520 6613'}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <a
-                            href={`https://wa.me/573205206613?text=Hola%20${encodeURIComponent(asp.Nombre_completo || '')},%20te%20escribimos%20de%20la%20Academia%20Frederick%20Floret%20para%20formalizar%20tu%20matr%C3%ADcula%20acad%C3%A9mica.`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors"
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>Contactar para Matrícula</span>
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
                 )}
               </tbody>
             </table>

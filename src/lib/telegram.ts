@@ -7,7 +7,13 @@ import { supabase } from '@/lib/supabase';
 
 let cachedTelegramConfig: { token: string; chatId: string; timestamp: number } | null = null;
 
-async function getTelegramCredentials(): Promise<{ token: string; chatId: string } | null> {
+export interface TelegramInlineButton {
+  text: string;
+  callback_data?: string;
+  url?: string;
+}
+
+export async function getTelegramCredentials(): Promise<{ token: string; chatId: string } | null> {
   let token = process.env.TELEGRAM_BOT_TOKEN;
   let chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -43,7 +49,62 @@ async function getTelegramCredentials(): Promise<{ token: string; chatId: string
   return token && chatId ? { token, chatId } : null;
 }
 
-export async function sendTelegramAlert(message: string): Promise<boolean> {
+export function buildLeadInlineKeyboard(
+  leadId: string | number,
+  currentStatus: string = 'pendiente',
+  phone?: string,
+  acudientePhone?: string
+): TelegramInlineButton[][] {
+  const rows: TelegramInlineButton[][] = [];
+
+  // Fila 1: Botones de cambio de estado interactivo (Contactado, Matriculado, No Interesado)
+  const isContactado = currentStatus === 'contactado';
+  const isMatriculado = currentStatus === 'matriculado';
+  const isNoInteresado = currentStatus === 'no_interesado' || currentStatus === 'descartado';
+
+  const statusRow: TelegramInlineButton[] = [
+    {
+      text: isContactado ? '✅ Contactado' : '📞 Contactado',
+      callback_data: `lead:contactado:${leadId}`
+    },
+    {
+      text: isMatriculado ? '✅ Matriculado' : '🎓 Matriculado',
+      callback_data: `lead:matriculado:${leadId}`
+    },
+    {
+      text: isNoInteresado ? '✅ No Interesado' : '❌ No Interesado',
+      callback_data: `lead:no_interesado:${leadId}`
+    }
+  ];
+  rows.push(statusRow);
+
+  // Fila 2: Enlaces directos a WhatsApp para atención inmediata
+  const contactRow: TelegramInlineButton[] = [];
+  if (phone) {
+    const cleanPhone = phone.replace(/\D/g, '');
+    contactRow.push({
+      text: '💬 WhatsApp Aspirante',
+      url: `https://wa.me/57${cleanPhone}`
+    });
+  }
+  if (acudientePhone) {
+    const cleanAcudientePhone = acudientePhone.replace(/\D/g, '');
+    contactRow.push({
+      text: '🛡️ WhatsApp Acudiente',
+      url: `https://wa.me/57${cleanAcudientePhone}`
+    });
+  }
+  if (contactRow.length > 0) {
+    rows.push(contactRow);
+  }
+
+  return rows;
+}
+
+export async function sendTelegramAlert(
+  message: string,
+  inlineKeyboard?: TelegramInlineButton[][]
+): Promise<boolean> {
   const creds = await getTelegramCredentials();
 
   if (!creds || !creds.token || !creds.chatId) {
@@ -52,15 +113,23 @@ export async function sendTelegramAlert(message: string): Promise<boolean> {
   }
 
   try {
+    const payload: Record<string, any> = {
+      chat_id: creds.chatId,
+      text: message,
+      parse_mode: 'Markdown',
+      disable_web_page_preview: true,
+    };
+
+    if (inlineKeyboard && inlineKeyboard.length > 0) {
+      payload.reply_markup = {
+        inline_keyboard: inlineKeyboard
+      };
+    }
+
     const response = await fetch(`https://api.telegram.org/bot${creds.token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: creds.chatId,
-        text: message,
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
