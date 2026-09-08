@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Si estamos en la página de login, no mostrar el layout administrativo con sidebar
   const isLoginPage = pathname === '/admin/login';
@@ -96,8 +97,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: 'APIs & Integraciones', href: '/admin/apis', icon: KeyRound },
     { label: 'Seguridad 2FA', href: '/admin/seguridad', icon: ShieldCheck },
   ];
-
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row antialiased">
