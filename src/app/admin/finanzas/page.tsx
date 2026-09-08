@@ -314,18 +314,38 @@ export default function AdminFinanzasPage() {
     return estudiantesQ10.filter(e => (e as any).categoria === 'empleado_docente');
   }, [estudiantesQ10]);
 
-  // Resumen Métricas
-  const totalRecaudoQ10 = matriculadosOficiales.reduce((sum, est) => {
-    const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
-    return sum + tarifa;
-  }, 0);
+  // Resumen Métricas Dinámicas
+  const totalPotencialQ10 = useMemo(() => {
+    return estudiantesQ10
+      .filter(e => (e as any).categoria !== 'empleado_docente')
+      .reduce((sum, est) => {
+        const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
+        return sum + tarifa;
+      }, 0);
+  }, [estudiantesQ10]);
+
+  const totalRecaudoMatriculados = useMemo(() => {
+    return matriculadosOficiales.reduce((sum, est) => {
+      const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
+      return sum + tarifa;
+    }, 0);
+  }, [matriculadosOficiales]);
+
+  const totalCarteraPendiente = useMemo(() => {
+    return inscritosQ10.reduce((sum, est) => {
+      const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
+      return sum + tarifa;
+    }, 0);
+  }, [inscritosQ10]);
 
   const estudiantesAlDia = matriculadosOficiales.filter(e => e.estado_financiero === 'al_dia').length;
-  const estudiantesDeudores = matriculadosOficiales.filter(e => e.estado_financiero === 'deudor').length;
-  const totalCarteraPendiente = matriculadosOficiales.reduce((sum, e) => sum + (e.saldo_pendiente || 0), 0);
-  const cumpleanerosMes = matriculadosOficiales.filter(e => e.mes_cumpleanos === mesActual).length;
+  const cumpleanerosMes = useMemo(() => {
+    return estudiantesQ10.filter(e => e.mes_cumpleanos === mesActual && (e as any).categoria !== 'empleado_docente').length;
+  }, [estudiantesQ10, mesActual]);
 
-  const periodosDisponibles = Array.from(new Set(matriculadosOficiales.map(e => e.Periodo_nombre || e.per_nombre))).filter(Boolean);
+  const periodosDisponibles = useMemo(() => {
+    return Array.from(new Set(estudiantesQ10.map(e => e.Periodo_nombre || e.per_nombre))).filter(Boolean);
+  }, [estudiantesQ10]);
 
   // Filtrado de la lista activa
   const listToFilter = activeTab === 'matriculados' 
@@ -338,6 +358,16 @@ export default function AdminFinanzasPage() {
 
   const filteredItems = useMemo(() => {
     return listToFilter.filter((est: EstudianteQ10) => {
+      const matchSearch = busqueda === '' ||
+        `${est.Nombre_completo} ${est.Numero_identificacion} ${est.Codigo_estudiante} ${est.Nombre_programa} ${(est as any).cargo_funcion || ''} ${(est as any).area_dependencia || ''}`.toLowerCase().includes(busqueda.toLowerCase());
+
+      if (!matchSearch) return false;
+
+      // Para pestaña empleados: no aplicar filtros financieros o de ciclo escolar
+      if (activeTab === 'empleados') {
+        return true;
+      }
+
       const matchPeriodo = filtroPeriodo === 'todos' || est.Periodo_nombre === filtroPeriodo || est.per_nombre === filtroPeriodo;
       const matchProg = filtroPrograma === 'todos' || est.Nombre_programa.toLowerCase().includes(filtroPrograma.toLowerCase()) || est.Codigo_programa.toLowerCase().includes(filtroPrograma.toLowerCase());
       
@@ -346,12 +376,9 @@ export default function AdminFinanzasPage() {
       if (filtroFinanciero === 'deudor') matchFinanciero = est.estado_financiero === 'deudor';
       if (filtroFinanciero === 'cumpleanos') matchFinanciero = est.mes_cumpleanos === mesActual;
 
-      const matchSearch = busqueda === '' ||
-        `${est.Nombre_completo} ${est.Numero_identificacion} ${est.Codigo_estudiante} ${est.Nombre_programa}`.toLowerCase().includes(busqueda.toLowerCase());
-
-      return matchPeriodo && matchProg && matchFinanciero && matchSearch;
+      return matchPeriodo && matchProg && matchFinanciero;
     });
-  }, [listToFilter, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, mesActual]);
+  }, [listToFilter, activeTab, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, mesActual]);
 
   // Paginación
   const totalPaginas = porPagina === 0 ? 1 : Math.ceil(filteredItems.length / porPagina);
@@ -361,10 +388,17 @@ export default function AdminFinanzasPage() {
     return filteredItems.slice(inicio, inicio + porPagina);
   }, [filteredItems, paginaActual, porPagina]);
 
-  // Reset página cuando cambian los filtros
+  // Reset página y filtros cuando cambian de pestaña
   useEffect(() => {
     setPaginaActual(1);
-  }, [activeTab, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, porPagina]);
+    setFiltroFinanciero('todos');
+    setFiltroPeriodo('todos');
+    setFiltroPrograma('todos');
+  }, [activeTab]);
+
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, porPagina]);
 
   // Generador de plantillas de correo & mensaje
   const getPlantillaMensaje = (est: EstudianteQ10, tipo: typeof tipoMensaje) => {
@@ -435,41 +469,41 @@ export default function AdminFinanzasPage() {
       {/* Tarjetas KPI Reales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        {/* Recaudo Total Matrículas Q10 */}
+        {/* Recaudo Proyectado Matrículas Q10 */}
         <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
-              Recaudo Estimado Matrículas
+              Proyección Total Matrículas
             </span>
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900">
-            {formatCOP(totalRecaudoQ10)}
+            {formatCOP(totalPotencialQ10)}
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{estudiantesAlDia} estudiantes al día</span>
+            <span>{matriculadosOficiales.length} formalizados · {inscritosQ10.length} inscritos</span>
           </div>
         </div>
 
-        {/* Cartera con Saldo Pendiente */}
+        {/* Cartera con Saldo Pendiente / Por Formalizar */}
         <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-red-600">
-              Cartera por Cobrar
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+              Pendiente por Formalizar
             </span>
-            <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
               <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-red-600">
+          <div className="text-2xl sm:text-3xl font-black text-amber-600">
             {formatCOP(totalCarteraPendiente)}
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-red-600 font-semibold">
+          <div className="flex items-center gap-1.5 text-[11px] text-amber-700 font-semibold">
             <AlertCircle className="w-3.5 h-3.5" />
-            <span>{estudiantesDeudores} estudiantes con cuota pendiente</span>
+            <span>{inscritosQ10.length} aspirantes por formalizar</span>
           </div>
         </div>
 
@@ -606,8 +640,8 @@ export default function AdminFinanzasPage() {
           {activeTab !== 'leads' && (
             <div className="flex flex-wrap items-center gap-3 pt-2">
               
-              {/* Filtros Rápidos de Cartera y Cumpleaños */}
-              {activeTab === 'matriculados' && (
+              {/* Filtros Rápidos de Cumpleaños y Estados */}
+              {(activeTab === 'inscritos' || activeTab === 'matriculados') && (
                 <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
                   <button
                     onClick={() => setFiltroFinanciero('todos')}
@@ -615,26 +649,21 @@ export default function AdminFinanzasPage() {
                       filtroFinanciero === 'todos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    Todos ({matriculadosOficiales.length})
+                    Todos ({activeTab === 'inscritos' ? inscritosQ10.length : matriculadosOficiales.length})
                   </button>
-                  <button
-                    onClick={() => setFiltroFinanciero('al_dia')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                      filtroFinanciero === 'al_dia' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 hover:bg-emerald-50'
-                    }`}
-                  >
-                    <UserCheck className="w-3.5 h-3.5" />
-                    <span>Al Día ({estudiantesAlDia})</span>
-                  </button>
-                  <button
-                    onClick={() => setFiltroFinanciero('deudor')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                      filtroFinanciero === 'deudor' ? 'bg-red-600 text-white shadow-xs' : 'text-red-700 hover:bg-red-50'
-                    }`}
-                  >
-                    <UserX className="w-3.5 h-3.5" />
-                    <span>Deudores ({estudiantesDeudores})</span>
-                  </button>
+                  {activeTab === 'matriculados' && (
+                    <>
+                      <button
+                        onClick={() => setFiltroFinanciero('al_dia')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          filtroFinanciero === 'al_dia' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 hover:bg-emerald-50'
+                        }`}
+                      >
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Al Día ({estudiantesAlDia})</span>
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => setFiltroFinanciero('cumpleanos')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
@@ -648,13 +677,13 @@ export default function AdminFinanzasPage() {
               )}
 
               {/* Filtro por Periodo */}
-              {activeTab === 'matriculados' && (
+              {(activeTab === 'inscritos' || activeTab === 'matriculados') && (
                 <select
                   value={filtroPeriodo}
                   onChange={(e) => setFiltroPeriodo(e.target.value)}
                   className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700"
                 >
-                  <option value="todos">Todos los Periodos</option>
+                  <option value="todos">Todos los Periodos ({periodosDisponibles.length})</option>
                   {periodosDisponibles.map((p) => (
                     <option key={p} value={p}>Periodo {p}</option>
                   ))}
@@ -662,7 +691,7 @@ export default function AdminFinanzasPage() {
               )}
 
               {/* Filtro por Programa */}
-              {activeTab === 'matriculados' && (
+              {(activeTab === 'inscritos' || activeTab === 'matriculados') && (
                 <select
                   value={filtroPrograma}
                   onChange={(e) => setFiltroPrograma(e.target.value)}
