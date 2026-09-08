@@ -14,7 +14,8 @@ import {
   TrendingUp,
   FileSpreadsheet,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  DollarSign
 } from 'lucide-react';
 
 interface Lead {
@@ -234,8 +235,23 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Accesos Rápidos de Gestión */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
+        <Link
+          href="/admin/finanzas"
+          className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-emerald-500/40 hover:shadow-md transition-all space-y-2 group"
+        >
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <DollarSign className="w-5 h-5" />
+          </div>
+          <h4 className="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+            Finanzas &amp; Recaudos
+          </h4>
+          <p className="text-xs text-slate-500">
+            Control de tarifas Q10, becas, proyección de ingresos y pasarela Wompi.
+          </p>
+        </Link>
+
         <Link
           href="/admin/contenido"
           className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-[#D51C28]/40 hover:shadow-md transition-all space-y-2 group"
@@ -244,16 +260,16 @@ export default function AdminDashboardPage() {
             <TrendingUp className="w-5 h-5" />
           </div>
           <h4 className="font-bold text-slate-900 group-hover:text-[#D51C28] transition-colors">
-            Modificar Textos de la Web
+            Modificar Textos Web
           </h4>
           <p className="text-xs text-slate-500">
-            Cambia los números de WhatsApp, teléfonos, dirección y aviso de cupos en vivo.
+            Cambia los números de WhatsApp, teléfonos, dirección y cupos en vivo.
           </p>
         </Link>
 
         <Link
           href="/admin/programas"
-          className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-[#D51C28]/40 hover:shadow-md transition-all space-y-2 group"
+          className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-blue-500/40 hover:shadow-md transition-all space-y-2 group"
         >
           <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
             <GraduationCap className="w-5 h-5" />
@@ -262,22 +278,22 @@ export default function AdminDashboardPage() {
             Administrar Programas
           </h4>
           <p className="text-xs text-slate-500">
-            Edita descripciones, salidas ocupacionales y resoluciones de los 6 programas.
+            Edita descripciones, salidas ocupacionales y resoluciones oficiales.
           </p>
         </Link>
 
         <Link
           href="/admin/seguridad"
-          className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-[#D51C28]/40 hover:shadow-md transition-all space-y-2 group"
+          className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-amber-500/40 hover:shadow-md transition-all space-y-2 group"
         >
           <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <h4 className="font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
-            Google Authenticator (2FA)
+            Seguridad 2FA
           </h4>
           <p className="text-xs text-slate-500">
-            Configura el código QR de seguridad para proteger el acceso a este panel.
+            Configura el código QR de doble factor para proteger el acceso admin.
           </p>
         </Link>
 

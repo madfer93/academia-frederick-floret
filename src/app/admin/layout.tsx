@@ -17,7 +17,8 @@ import {
   X,
   Lock,
   KeyRound,
-  BarChart3
+  BarChart3,
+  DollarSign
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -87,6 +88,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const NAV_ITEMS = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Inscripciones (Leads)', href: '/admin/inscripciones', icon: Users },
+    { label: 'Finanzas & Recaudos', href: '/admin/finanzas', icon: DollarSign },
     { label: 'Métricas & Tráfico', href: '/admin/metricas', icon: BarChart3 },
     { label: 'Programas Técnicos', href: '/admin/programas', icon: GraduationCap },
     { label: 'Contenidos Web', href: '/admin/contenido', icon: FileEdit },
