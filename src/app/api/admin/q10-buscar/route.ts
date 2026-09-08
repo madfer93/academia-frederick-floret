@@ -31,16 +31,15 @@ export async function GET(req: Request) {
               Codigo_estudiante: d.Codigo_estudiante,
               Nombre_completo: `${d.Primer_nombre} ${d.Segundo_nombre || ''} ${d.Primer_apellido} ${d.Segundo_apellido || ''}`.replace(/\s+/g, ' ').trim(),
               Codigo_tipo_identificacion: d.Codigo_tipo_identificacion || '1',
-              Numero_identificacion: d.Numero_identificacion,
-              Codigo_programa: 'TLASO', // default o mapeado
-              Nombre_programa: 'Técnico Laboral en Salud Oral',
-              Consecutivo_sede_jornada: 8,
-              Nombre_sede_jornada: 'Principal - Sábados',
-              Periodo_nombre: '2026-2',
-              Fecha_inscripcion: d.Fecha_nacimiento || new Date().toISOString(),
-              email: d.Email,
-              telefono: d.Celular || d.Telefono,
-              direccion: d.Direccion,
+              Codigo_programa: 'SIN_PROGRAMA',
+              Nombre_programa: 'Registrado en Q10',
+              Consecutivo_sede_jornada: 0,
+              Nombre_sede_jornada: 'Pendiente',
+              Periodo_nombre: 'Pendiente',
+              Fecha_inscripcion: new Date().toISOString(),
+              email: d.Email || '',
+              telefono: d.Celular || d.Telefono || '',
+              direccion: d.Direccion || '',
               origen_q10: 'estudiante_directo'
             };
           }

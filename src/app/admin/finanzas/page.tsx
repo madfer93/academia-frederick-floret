@@ -83,7 +83,7 @@ export default function AdminFinanzasPage() {
   const [descuentos, setDescuentos] = useState<DescuentoQ10[]>([]);
   const [estudiantesQ10, setEstudiantesQ10] = useState<EstudianteQ10[]>([]);
   const [leadsWeb, setLeadsWeb] = useState<LeadWeb[]>([]);
-  const [activeTab, setActiveTab] = useState<'q10' | 'leads'>('q10');
+  const [activeTab, setActiveTab] = useState<'matriculados' | 'sin_matricula' | 'leads'>('matriculados');
   
   // Filtros
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos');
@@ -124,6 +124,7 @@ export default function AdminFinanzasPage() {
     'Técnico Laboral Asistente De Marketing Y Comunicación': 1100000,
     'TLAAO': 1100000,
     'Tecnico Laboral  Auxiliar Administrativo Organizacional': 1100000,
+    'SIN_PROGRAMA': 0
   };
 
   const fetchAllData = async () => {
@@ -136,10 +137,10 @@ export default function AdminFinanzasPage() {
         if (q10Json.inscripciones) {
           // Enriquecer datos con estados financieros y cumpleaños
           const mesActual = new Date().getMonth() + 1;
-          const enriched: EstudianteQ10[] = q10Json.inscripciones.map((item: EstudianteQ10, idx: number) => {
+          const enriched: EstudianteQ10[] = q10Json.inscripciones.map((item: any, idx: number) => {
             const tarifa = TARIFAS_PROGRAMAS[item.Codigo_programa] || TARIFAS_PROGRAMAS[item.Nombre_programa] || 1250000;
             // Distribución realista de estados de cartera
-            const isDeudor = idx % 3 === 0; // ~33% con saldo pendiente
+            const isDeudor = item.categoria === 'matriculado_oficial' && idx % 3 === 0;
             const saldo = isDeudor ? Math.round(tarifa * 0.4) : 0;
             const estado_financiero: 'al_dia' | 'deudor' | 'en_proceso' = isDeudor ? 'deudor' : 'al_dia';
             
@@ -153,8 +154,8 @@ export default function AdminFinanzasPage() {
               saldo_pendiente: saldo,
               mes_cumpleanos: mes_cumple,
               dia_cumpleanos: dia_cumple,
-              email: `${item.Codigo_estudiante}@estudiantes.floret.edu.co`,
-              telefono: `3205206613`
+              email: item.email || `${item.Codigo_estudiante}@estudiantes.floret.edu.co`,
+              telefono: item.telefono || `3205206613`
             };
           });
 
@@ -208,22 +209,37 @@ export default function AdminFinanzasPage() {
   const mesActual = new Date().getMonth() + 1;
   const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+  // Separación clara de grupos
+  const matriculadosOficiales = useMemo(() => {
+    return estudiantesQ10.filter(e => (e as any).categoria === 'matriculado_oficial');
+  }, [estudiantesQ10]);
+
+  const personasSinMatricula = useMemo(() => {
+    return estudiantesQ10.filter(e => (e as any).categoria !== 'matriculado_oficial');
+  }, [estudiantesQ10]);
+
   // Resumen Métricas
-  const totalRecaudoQ10 = estudiantesQ10.reduce((sum, est) => {
+  const totalRecaudoQ10 = matriculadosOficiales.reduce((sum, est) => {
     const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
     return sum + tarifa;
   }, 0);
 
-  const estudiantesAlDia = estudiantesQ10.filter(e => e.estado_financiero === 'al_dia').length;
-  const estudiantesDeudores = estudiantesQ10.filter(e => e.estado_financiero === 'deudor').length;
-  const totalCarteraPendiente = estudiantesQ10.reduce((sum, e) => sum + (e.saldo_pendiente || 0), 0);
-  const cumpleanerosMes = estudiantesQ10.filter(e => e.mes_cumpleanos === mesActual).length;
+  const estudiantesAlDia = matriculadosOficiales.filter(e => e.estado_financiero === 'al_dia').length;
+  const estudiantesDeudores = matriculadosOficiales.filter(e => e.estado_financiero === 'deudor').length;
+  const totalCarteraPendiente = matriculadosOficiales.reduce((sum, e) => sum + (e.saldo_pendiente || 0), 0);
+  const cumpleanerosMes = matriculadosOficiales.filter(e => e.mes_cumpleanos === mesActual).length;
 
-  const periodosDisponibles = Array.from(new Set(estudiantesQ10.map(e => e.Periodo_nombre || e.per_nombre))).filter(Boolean);
+  const periodosDisponibles = Array.from(new Set(matriculadosOficiales.map(e => e.Periodo_nombre || e.per_nombre))).filter(Boolean);
 
-  // Filtrado de estudiantes Q10
-  const filteredQ10 = useMemo(() => {
-    return estudiantesQ10.filter(est => {
+  // Filtrado de la lista activa
+  const listToFilter = activeTab === 'matriculados' 
+    ? matriculadosOficiales 
+    : activeTab === 'sin_matricula' 
+    ? personasSinMatricula 
+    : [];
+
+  const filteredItems = useMemo(() => {
+    return listToFilter.filter(est => {
       const matchPeriodo = filtroPeriodo === 'todos' || est.Periodo_nombre === filtroPeriodo || est.per_nombre === filtroPeriodo;
       const matchProg = filtroPrograma === 'todos' || est.Nombre_programa.toLowerCase().includes(filtroPrograma.toLowerCase()) || est.Codigo_programa.toLowerCase().includes(filtroPrograma.toLowerCase());
       
@@ -237,20 +253,20 @@ export default function AdminFinanzasPage() {
 
       return matchPeriodo && matchProg && matchFinanciero && matchSearch;
     });
-  }, [estudiantesQ10, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, mesActual]);
+  }, [listToFilter, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, mesActual]);
 
-  // Paginación Q10
-  const totalPaginas = porPagina === 0 ? 1 : Math.ceil(filteredQ10.length / porPagina);
+  // Paginación
+  const totalPaginas = porPagina === 0 ? 1 : Math.ceil(filteredItems.length / porPagina);
   const estudiantesPaginados = useMemo(() => {
-    if (porPagina === 0) return filteredQ10;
+    if (porPagina === 0) return filteredItems;
     const inicio = (paginaActual - 1) * porPagina;
-    return filteredQ10.slice(inicio, inicio + porPagina);
-  }, [filteredQ10, paginaActual, porPagina]);
+    return filteredItems.slice(inicio, inicio + porPagina);
+  }, [filteredItems, paginaActual, porPagina]);
 
   // Reset página cuando cambian los filtros
   useEffect(() => {
     setPaginaActual(1);
-  }, [filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, porPagina]);
+  }, [activeTab, filtroPeriodo, filtroPrograma, filtroFinanciero, busqueda, porPagina]);
 
   // Generador de plantillas de correo & mensaje
   const getPlantillaMensaje = (est: EstudianteQ10, tipo: typeof tipoMensaje) => {
@@ -401,25 +417,37 @@ export default function AdminFinanzasPage() {
 
       </div>
 
-      {/* Selector de Pestañas: Estudiantes Q10 vs Prospectos Web */}
-      <div className="flex items-center gap-3 border-b border-slate-200 pb-2">
+      {/* Selector de Pestañas: Matriculados Q10 vs Registrados sin Matrícula vs Leads */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         <button
-          onClick={() => setActiveTab('q10')}
-          className={`px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === 'q10'
-              ? 'bg-slate-900 text-white shadow-lg'
+          onClick={() => setActiveTab('matriculados')}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+            activeTab === 'matriculados'
+              ? 'bg-slate-900 text-white shadow-md'
               : 'text-slate-600 hover:bg-slate-200/60'
           }`}
         >
           <GraduationCap className="w-4 h-4 text-emerald-400" />
-          <span>🎓 Estudiantes Matriculados Q10 ({estudiantesQ10.length})</span>
+          <span>🎓 Matriculados Oficiales Q10 ({matriculadosOficiales.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('sin_matricula')}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+            activeTab === 'sin_matricula'
+              ? 'bg-slate-900 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-200/60'
+          }`}
+        >
+          <Users className="w-4 h-4 text-blue-400" />
+          <span>📋 Registrados Q10 (Sin Matrícula / Contactos) ({personasSinMatricula.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('leads')}
-          className={`px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'leads'
-              ? 'bg-slate-900 text-white shadow-lg'
+              ? 'bg-slate-900 text-white shadow-md'
               : 'text-slate-600 hover:bg-slate-200/60'
           }`}
         >
@@ -436,12 +464,16 @@ export default function AdminFinanzasPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-black text-slate-900">
-                {activeTab === 'q10'
+                {activeTab === 'matriculados'
                   ? 'Listado Oficial de Estudiantes Matriculados (Q10 Académico)'
+                  : activeTab === 'sin_matricula'
+                  ? 'Personas y Contactos Registrados en Q10 (Pendientes de Legalizar Matrícula)'
                   : 'Prospectos Captados desde el Formulario Web y Chatbot IA'}
               </h3>
               <p className="text-xs text-slate-500">
-                Mostrando {filteredQ10.length} estudiantes según los filtros aplicados.
+                {activeTab === 'leads'
+                  ? `Mostrando ${leadsWeb.length} aspirantes web.`
+                  : `Mostrando ${filteredItems.length} registros según los filtros aplicados.`}
               </p>
             </div>
 
@@ -458,107 +490,113 @@ export default function AdminFinanzasPage() {
             </div>
           </div>
 
-          {/* Filtros Específicos */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            
-            {/* Filtros Rápidos de Cartera y Cumpleaños */}
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-              <button
-                onClick={() => setFiltroFinanciero('todos')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  filtroFinanciero === 'todos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Todos ({estudiantesQ10.length})
-              </button>
-              <button
-                onClick={() => setFiltroFinanciero('al_dia')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  filtroFinanciero === 'al_dia' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 hover:bg-emerald-50'
-                }`}
-              >
-                <UserCheck className="w-3.5 h-3.5" />
-                <span>Al Día ({estudiantesAlDia})</span>
-              </button>
-              <button
-                onClick={() => setFiltroFinanciero('deudor')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  filtroFinanciero === 'deudor' ? 'bg-red-600 text-white shadow-xs' : 'text-red-700 hover:bg-red-50'
-                }`}
-              >
-                <UserX className="w-3.5 h-3.5" />
-                <span>Deudores ({estudiantesDeudores})</span>
-              </button>
-              <button
-                onClick={() => setFiltroFinanciero('cumpleanos')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  filtroFinanciero === 'cumpleanos' ? 'bg-purple-600 text-white shadow-xs' : 'text-purple-700 hover:bg-purple-50'
-                }`}
-              >
-                <Cake className="w-3.5 h-3.5" />
-                <span>Cumpleaños Mes ({cumpleanerosMes})</span>
-              </button>
+          {/* Filtros Específicos para Q10 */}
+          {activeTab !== 'leads' && (
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              
+              {/* Filtros Rápidos de Cartera y Cumpleaños */}
+              {activeTab === 'matriculados' && (
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                  <button
+                    onClick={() => setFiltroFinanciero('todos')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      filtroFinanciero === 'todos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Todos ({matriculadosOficiales.length})
+                  </button>
+                  <button
+                    onClick={() => setFiltroFinanciero('al_dia')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      filtroFinanciero === 'al_dia' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>Al Día ({estudiantesAlDia})</span>
+                  </button>
+                  <button
+                    onClick={() => setFiltroFinanciero('deudor')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      filtroFinanciero === 'deudor' ? 'bg-red-600 text-white shadow-xs' : 'text-red-700 hover:bg-red-50'
+                    }`}
+                  >
+                    <UserX className="w-3.5 h-3.5" />
+                    <span>Deudores ({estudiantesDeudores})</span>
+                  </button>
+                  <button
+                    onClick={() => setFiltroFinanciero('cumpleanos')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      filtroFinanciero === 'cumpleanos' ? 'bg-purple-600 text-white shadow-xs' : 'text-purple-700 hover:bg-purple-50'
+                    }`}
+                  >
+                    <Cake className="w-3.5 h-3.5" />
+                    <span>Cumpleaños Mes ({cumpleanerosMes})</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Filtro por Periodo */}
+              {activeTab === 'matriculados' && (
+                <select
+                  value={filtroPeriodo}
+                  onChange={(e) => setFiltroPeriodo(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700"
+                >
+                  <option value="todos">Todos los Periodos</option>
+                  {periodosDisponibles.map((p) => (
+                    <option key={p} value={p}>Periodo {p}</option>
+                  ))}
+                </select>
+              )}
+
+              {/* Filtro por Programa */}
+              {activeTab === 'matriculados' && (
+                <select
+                  value={filtroPrograma}
+                  onChange={(e) => setFiltroPrograma(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700"
+                >
+                  <option value="todos">Todos los Programas</option>
+                  <option value="Enfermería">Enfermería</option>
+                  <option value="Farmacéuticos">Servicios Farmacéuticos</option>
+                  <option value="Administrativo">Administrativo Organizacional</option>
+                  <option value="Salud Oral">Salud Oral</option>
+                  <option value="Infancia">Primera Infancia</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Contable">Contable</option>
+                </select>
+              )}
+
+              {/* Selector de Paginación */}
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-xs text-slate-500 font-semibold">Mostrar:</span>
+                <select
+                  value={porPagina}
+                  onChange={(e) => setPorPagina(Number(e.target.value))}
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700 cursor-pointer"
+                >
+                  <option value={10}>10 por página</option>
+                  <option value={25}>25 por página</option>
+                  <option value={50}>50 por página</option>
+                  <option value={0}>Ver Todos ({filteredItems.length})</option>
+                </select>
+              </div>
+
             </div>
-
-            {/* Filtro por Periodo */}
-            {activeTab === 'q10' && (
-              <select
-                value={filtroPeriodo}
-                onChange={(e) => setFiltroPeriodo(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700"
-              >
-                <option value="todos">Todos los Periodos</option>
-                {periodosDisponibles.map((p) => (
-                  <option key={p} value={p}>Periodo {p}</option>
-                ))}
-              </select>
-            )}
-
-            {/* Filtro por Programa */}
-            <select
-              value={filtroPrograma}
-              onChange={(e) => setFiltroPrograma(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700"
-            >
-              <option value="todos">Todos los Programas</option>
-              <option value="Enfermería">Enfermería</option>
-              <option value="Farmacéuticos">Servicios Farmacéuticos</option>
-              <option value="Administrativo">Administrativo Organizacional</option>
-              <option value="Salud Oral">Salud Oral</option>
-              <option value="Infancia">Primera Infancia</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Contable">Contable</option>
-            </select>
-
-            {/* Selector de Paginación / Cantidad de Personas por Página */}
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-semibold">Mostrar:</span>
-              <select
-                value={porPagina}
-                onChange={(e) => setPorPagina(Number(e.target.value))}
-                className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-[#D51C28] outline-hidden bg-slate-50 text-slate-700 cursor-pointer"
-              >
-                <option value={10}>10 por página</option>
-                <option value={25}>25 por página</option>
-                <option value={50}>50 por página</option>
-                <option value={0}>Ver Todos ({filteredQ10.length})</option>
-              </select>
-            </div>
-
-          </div>
+          )}
         </div>
 
         {/* TABLA PRINCIPAL */}
         <div className="overflow-x-auto">
-          {activeTab === 'q10' ? (
+          {activeTab !== 'leads' ? (
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-4 px-6">Estudiante / Identificación</th>
-                  <th className="py-4 px-6">Programa Académico</th>
+                  <th className="py-4 px-6">{activeTab === 'matriculados' ? 'Programa Académico' : 'Estado en Q10'}</th>
                   <th className="py-4 px-6">Sede &amp; Jornada</th>
                   <th className="py-4 px-6 text-center">Periodo</th>
-                  <th className="py-4 px-6">Estado Financiero</th>
+                  <th className="py-4 px-6">Estado Matrícula / Cartera</th>
                   <th className="py-4 px-6">Tarifa / Inversión</th>
                   <th className="py-4 px-6 text-right">Acciones &amp; Mensajes</th>
                 </tr>
@@ -567,13 +605,14 @@ export default function AdminFinanzasPage() {
                 {estudiantesPaginados.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-slate-400">
-                      No se encontraron estudiantes con los filtros seleccionados.
+                      No se encontraron registros con los filtros seleccionados.
                     </td>
                   </tr>
                 ) : (
                   estudiantesPaginados.map((est) => {
                     const tarifa = TARIFAS_PROGRAMAS[est.Codigo_programa] || TARIFAS_PROGRAMAS[est.Nombre_programa] || 1250000;
                     const esCumpleMes = est.mes_cumpleanos === mesActual;
+                    const esMatriculado = (est as any).categoria === 'matriculado_oficial';
 
                     return (
                       <tr key={est.Consecutivo_inscripcion} className="hover:bg-slate-50/90 transition-colors">
@@ -583,7 +622,7 @@ export default function AdminFinanzasPage() {
                           </div>
                           <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
                             <span>CC: {est.Numero_identificacion || est.Codigo_estudiante}</span>
-                            {esCumpleMes && (
+                            {esCumpleMes && esMatriculado && (
                               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[9px] font-extrabold" title={`Cumpleaños: Día ${est.dia_cumpleanos}`}>
                                 <Cake className="w-2.5 h-2.5" /> Cumpleañero
                               </span>
@@ -592,36 +631,46 @@ export default function AdminFinanzasPage() {
                         </td>
                         <td className="py-4 px-6">
                           <div className="font-semibold text-slate-800 leading-snug">{est.Nombre_programa}</div>
-                          <div className="text-[10px] text-slate-400 font-bold uppercase">{est.Codigo_programa}</div>
+                          {esMatriculado && (
+                            <div className="text-[10px] text-slate-400 font-bold uppercase">{est.Codigo_programa}</div>
+                          )}
                         </td>
                         <td className="py-4 px-6">
                           <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium whitespace-nowrap">
-                            {est.Nombre_sede_jornada || est.Nombre_jornada || 'Principal'}
+                            {est.Nombre_sede_jornada || est.Nombre_jornada || 'Pendiente'}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-center">
-                          <span className="inline-block px-3 py-1 rounded-lg bg-blue-50 text-blue-800 font-black text-xs border border-blue-200 whitespace-nowrap">
-                            {est.Periodo_nombre || est.per_nombre || '2026-2'}
+                          <span className={`inline-block px-3 py-1 rounded-lg font-black text-xs border whitespace-nowrap ${
+                            esMatriculado ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                          }`}>
+                            {est.Periodo_nombre || est.per_nombre || 'Pendiente'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                          {est.estado_financiero === 'al_dia' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Al Día
-                            </span>
-                          ) : (
-                            <div>
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200 whitespace-nowrap">
-                                <AlertCircle className="w-3 h-3 text-red-600" /> Saldo Pendiente
+                          {esMatriculado ? (
+                            est.estado_financiero === 'al_dia' ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Al Día
                               </span>
-                              <div className="text-[10px] text-red-600 font-bold mt-0.5">
-                                Debe: {formatCOP(est.saldo_pendiente || 450000)}
+                            ) : (
+                              <div>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200 whitespace-nowrap">
+                                  <AlertCircle className="w-3 h-3 text-red-600" /> Saldo Pendiente
+                                </span>
+                                <div className="text-[10px] text-red-600 font-bold mt-0.5">
+                                  Debe: {formatCOP(est.saldo_pendiente || 450000)}
+                                </div>
                               </div>
-                            </div>
+                            )
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
+                              <Clock className="w-3 h-3 text-amber-600" /> Sin Matrícula Q10
+                            </span>
                           )}
                         </td>
                         <td className="py-4 px-6 font-black text-slate-900 text-xs whitespace-nowrap">
-                          {formatCOP(tarifa)}
+                          {tarifa > 0 ? formatCOP(tarifa) : 'N/A'}
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-1.5">
@@ -629,7 +678,9 @@ export default function AdminFinanzasPage() {
                             <button
                               onClick={() => {
                                 setModalEstudiante(est);
-                                if (est.estado_financiero === 'deudor') {
+                                if (!esMatriculado) {
+                                  setTipoMensaje('bienvenida');
+                                } else if (est.estado_financiero === 'deudor') {
                                   setTipoMensaje('cobro');
                                 } else if (esCumpleMes) {
                                   setTipoMensaje('cumpleanos');
@@ -718,10 +769,10 @@ export default function AdminFinanzasPage() {
         </div>
 
         {/* Barra de Paginación */}
-        {activeTab === 'q10' && totalPaginas > 1 && (
+        {activeTab !== 'leads' && totalPaginas > 1 && (
           <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
             <div className="text-xs text-slate-500">
-              Mostrando página <strong>{paginaActual}</strong> de <strong>{totalPaginas}</strong> ({filteredQ10.length} estudiantes en total)
+              Mostrando página <strong>{paginaActual}</strong> de <strong>{totalPaginas}</strong> ({filteredItems.length} registros en total)
             </div>
             <div className="flex items-center gap-1.5">
               <button

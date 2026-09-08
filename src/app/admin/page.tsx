@@ -69,7 +69,8 @@ export default function AdminDashboardPage() {
         console.warn('Supabase fetch notice:', e);
       }
 
-      const totalMatriculados = q10List.length > 0 ? q10List.length : 57;
+      const matriculadosOficiales = q10List.filter((e: any) => e.categoria === 'matriculado_oficial');
+      const totalMatriculados = matriculadosOficiales.length > 0 ? matriculadosOficiales.length : (q10List.length || 57);
       const totalWeb = webLeads.length;
       const pendWeb = webLeads.filter(l => l.estado === 'pendiente' || !l.estado).length;
 
@@ -80,11 +81,13 @@ export default function AdminDashboardPage() {
         totalProgramas: 9,
       });
 
-      // Mapear los estudiantes más recientes para la tabla
+      // Mapear los estudiantes con matrícula oficial más recientes para la tabla
       const displayItems: EstudianteDisplay[] = [];
 
-      if (q10List.length > 0) {
-        q10List.slice(0, 8).forEach(est => {
+      const listForTable = matriculadosOficiales.length > 0 ? matriculadosOficiales : q10List;
+
+      if (listForTable.length > 0) {
+        listForTable.slice(0, 8).forEach(est => {
           displayItems.push({
             id: est.Codigo_estudiante || String(est.Consecutivo_inscripcion),
             nombres: est.Nombre_completo,

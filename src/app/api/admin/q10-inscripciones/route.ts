@@ -63,77 +63,48 @@ export async function GET() {
     const results = await Promise.all(inscripcionesPromises);
     const allInscripcionesRaw = results.flat();
 
-    // 3. Unificar estudiantes sin duplicados en un mapa
+    // 3. Procesar inscripciones oficiales de Q10
     const studentsMap = new Map<string, any>();
 
-    // Agregar inscripciones
     allInscripcionesRaw.forEach((item: any) => {
       const key = item.Numero_identificacion || item.Codigo_estudiante;
       if (key) {
-        studentsMap.set(key, item);
+        studentsMap.set(key, {
+          ...item,
+          categoria: 'matriculado_oficial',
+          estado_matricula: 'Matriculado Oficial',
+          origen_q10: 'inscripcion_oficial'
+        });
       }
     });
 
-    // Agregar usuarios con rol estudiante
+    // 4. Agregar usuarios/personas de Q10 que NO tienen matrícula académica aún
     if (Array.isArray(usuarios)) {
       usuarios.forEach((u: any) => {
-        const isEstudiante = u.Roles && u.Roles.some((r: any) => r.Nombre === 'Estudiante');
         const key = u.Numero_identificacion || u.Nombre_usuario;
-        if (isEstudiante && key && !studentsMap.has(key)) {
+        if (key && !studentsMap.has(key)) {
+          const isDocente = u.Roles && u.Roles.some((r: any) => r.Nombre === 'Docente');
+          const isSuperAdmin = u.Roles && u.Roles.some((r: any) => r.Nombre === 'Superadministrador');
+
           studentsMap.set(key, {
             Consecutivo_inscripcion: Number(u.Codigo_persona) || Math.floor(1000 + Math.random() * 9000),
             Codigo_estudiante: u.Codigo_persona,
             Nombre_completo: u.Nombre_completo,
-            Codigo_tipo_identificacion: '1',
+            Codigo_tipo_identificacion: u.Codigo_tipo_identificacion || '1',
             Numero_identificacion: u.Numero_identificacion || u.Nombre_usuario,
-            Codigo_programa: 'AENF',
-            Nombre_programa: 'Técnico Laboral Auxiliar en Enfermería',
-            Consecutivo_sede_jornada: 5,
-            Nombre_sede_jornada: 'Principal - Diurna',
-            Periodo_nombre: '2026-2',
+            Codigo_programa: 'SIN_PROGRAMA',
+            Nombre_programa: isDocente ? 'Docente / Funcionario' : isSuperAdmin ? 'Administrador' : 'Sin Programa Asignado en Q10',
+            Consecutivo_sede_jornada: 0,
+            Nombre_sede_jornada: 'Pendiente',
+            Periodo_nombre: 'Pendiente',
             Fecha_inscripcion: new Date().toISOString(),
-            origen_q10: 'usuario_estudiante'
+            categoria: isDocente ? 'docente' : isSuperAdmin ? 'admin' : 'sin_matricula',
+            estado_matricula: isDocente ? 'Docente' : isSuperAdmin ? 'Administrador' : 'Registrado (Sin Matrícula)',
+            origen_q10: 'usuario_q10'
           });
         }
       });
     }
-
-    // 4. Asegurar que estudiantes consultados específicamente estén presentes
-    // María Cristina Ospina Galván
-    studentsMap.set('1068422613', {
-      Consecutivo_inscripcion: 3450,
-      Codigo_estudiante: '112186321750',
-      Nombre_completo: 'Maria Cristina Ospina Galvan',
-      Codigo_tipo_identificacion: '2',
-      Numero_identificacion: '1068422613',
-      Codigo_programa: 'TLASO',
-      Nombre_programa: 'Técnico Laboral Auxiliar en Salud Oral',
-      Consecutivo_sede_jornada: 8,
-      Nombre_sede_jornada: 'Principal - Sábados',
-      Periodo_nombre: '2026-2',
-      Fecha_inscripcion: '2026-08-20T00:00:00',
-      email: 'cristinaospina0830@gmail.com',
-      telefono: '3145443738',
-      origen_q10: 'estudiante_oficial'
-    });
-
-    // Daniela Carvajal Bedoya
-    studentsMap.set('1003046103', {
-      Consecutivo_inscripcion: 3451,
-      Codigo_estudiante: '334648890860',
-      Nombre_completo: 'Daniela Carvajal Bedoya',
-      Codigo_tipo_identificacion: '1',
-      Numero_identificacion: '1003046103',
-      Codigo_programa: 'AENF',
-      Nombre_programa: 'Técnico Laboral Auxiliar en Enfermería',
-      Consecutivo_sede_jornada: 5,
-      Nombre_sede_jornada: 'Principal - Diurna',
-      Periodo_nombre: '2026-2',
-      Fecha_inscripcion: '2026-08-15T00:00:00',
-      email: 'danielacarvajalbedoya@gmail.com',
-      telefono: '3013079456',
-      origen_q10: 'estudiante_oficial'
-    });
 
     const finalInscripciones = Array.from(studentsMap.values());
 
