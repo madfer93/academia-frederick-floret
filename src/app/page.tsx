@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
+import MaintenanceView from '@/components/MaintenanceView';
 import Link from 'next/link';
 import { 
   HeartPulse, 
@@ -78,6 +79,12 @@ const QUICK_PROGRAMS = [
 ];
 
 export default function Home() {
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE !== 'false';
+
+  if (isMaintenanceMode) {
+    return <MaintenanceView />;
+  }
+
   return (
     <main className="min-h-screen flex flex-col bg-slate-50 relative">
       <Navbar />

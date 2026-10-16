@@ -7,8 +7,9 @@ import { MessageCircle } from 'lucide-react';
 export default function WhatsAppButton() {
   const pathname = usePathname();
 
-  // No mostrar en panel administrativo para evitar colisiones con tablas/formularios
-  if (pathname?.startsWith('/admin')) {
+  // No mostrar en mantenimiento ni en panel administrativo
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE !== 'false';
+  if (isMaintenanceMode || pathname?.startsWith('/admin')) {
     return null;
   }
 

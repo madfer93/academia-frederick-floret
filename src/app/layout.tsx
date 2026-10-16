@@ -58,6 +58,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE !== 'false';
+
   return (
     <html lang="es" className={`${inter.variable} scroll-smooth`}>
       <head>
@@ -81,9 +83,13 @@ export default function RootLayout({
           `}
         </Script>
 
-        <WhatsAppButton />
-        <ChatBubble />
-        <PageTelemetryTracker />
+        {!isMaintenanceMode && (
+          <>
+            <WhatsAppButton />
+            <ChatBubble />
+            <PageTelemetryTracker />
+          </>
+        )}
         <Analytics />
 
         {/* Google reCAPTCHA v3 */}

@@ -122,8 +122,9 @@ export default function ChatBubble() {
     }
   }, [messages, isOpen, hasAcceptedPolicies]);
 
-  // Si estamos dentro del panel /admin, no mostrar la burbuja para no interferir con las tablas
-  if (pathname?.startsWith('/admin')) {
+  // Si estamos en modo mantenimiento o en panel /admin, no mostrar la burbuja
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE !== 'false';
+  if (isMaintenanceMode || pathname?.startsWith('/admin')) {
     return null;
   }
 
